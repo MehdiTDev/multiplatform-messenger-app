@@ -1,9 +1,12 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const { chats } = require("./data/data");
+const connectDB = require("./config/db");
 
-const app = express();
 dotenv.config();
+console.log("MONGO_URI:", process.env.MONGO_URI);
+connectDB();
+const app = express();
 
 app.get("/", (req, res) => res.send("API is running!"));
 
