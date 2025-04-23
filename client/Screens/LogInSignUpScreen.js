@@ -3,7 +3,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect, useState } from 'react';
 import { NativeBaseProvider, Box, Button, Input, Text, VStack, HStack, Pressable } from 'native-base';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Image } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function LogInSignUpScreen({ navigation }) {
 
@@ -24,6 +25,7 @@ export default function LogInSignUpScreen({ navigation }) {
 
     // Let to do is the pic thing!!!!
 
+    const [image, setImage] = useState(null);
 
 
 
@@ -35,6 +37,26 @@ export default function LogInSignUpScreen({ navigation }) {
 
 
 
+
+    const pickImage = async () => {
+        // Ask for permission
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (permissionResult.granted === false) {
+            alert("Permission to access camera roll is required!");
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setImage(result.assets[0].uri);
+        }
+    };
 
 
     const renderLoginForm = () => (
@@ -142,9 +164,17 @@ export default function LogInSignUpScreen({ navigation }) {
 
             <Box>
                 <Text style={styles.label}>Upload your Picture</Text>
-                <Button variant="outline" style={styles.uploadButton}>
-                    Choose file
+                <Button variant="outline" style={styles.uploadButton} onPress={pickImage}>
+                    Choose File
                 </Button>
+
+                {image && (
+                    <Image
+                        source={{ uri: image }}
+                        style={{ width: 100, height: 100, marginTop: 10, borderRadius: 50 }}
+                    />
+                )}
+
             </Box>
 
             <Button style={styles.signUpButton} colorScheme="blue">
