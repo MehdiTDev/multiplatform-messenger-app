@@ -1,47 +1,39 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native'
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet } from "react-native";
+import { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import StartScreen from "./Screens/StartScreen"
-import LogInSignUpScreen from "./Screens/LogInSignUpScreen"
 
+// Screens (renamed)
+import ChatPage from "./Screens/ChatPage";
+import HomePage from "./Screens/HomePage";
 
+const Stack = createNativeStackNavigator();
 
 export default function App() {
-
-
-  const myStack = createNativeStackNavigator();
-
   useEffect(() => {
-    console.log('App has started!');
+    console.log("App has started!");
   }, []);
 
   return (
-
-
-
-
-
     <NavigationContainer>
-      <myStack.Navigator initialRouteName="startScreen" screenOptions={{ headerShown: false }}>
-
-        <myStack.Screen name="startScreen" component={StartScreen} />
-        <myStack.Screen name="LogIn" component={LogInSignUpScreen} />
-
-
-      </myStack.Navigator>
+      <Stack.Navigator
+        initialRouteName="ChatPage"
+        screenOptions={{ headerShown: false }}
+      >
+        <Stack.Screen name="ChatPage" component={ChatPage} />
+        <Stack.Screen name="HomePage" component={HomePage} />
+      </Stack.Navigator>
+      <StatusBar style="auto" />
     </NavigationContainer>
-
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
