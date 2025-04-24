@@ -2,11 +2,15 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect, useState } from 'react';
-import { NativeBaseProvider, Box, Button, Input, Text, VStack, HStack, Pressable } from 'native-base';
+import { NativeBaseProvider, Box, Button, Input, Text, VStack, HStack, Pressable, useToast } from 'native-base';
 import { StyleSheet, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import axios from "axios";
 
 export default function LogInSignUpScreen({ navigation }) {
+
+    const toast = useToast();
+
 
     const [selectedTab, setSelectedTab] = useState('Login');
 
@@ -27,17 +31,6 @@ export default function LogInSignUpScreen({ navigation }) {
 
     const [image, setImage] = useState(null);
 
-
-
-
-
-
-
-
-
-
-
-
     const pickImage = async () => {
         // Ask for permission
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -57,6 +50,138 @@ export default function LogInSignUpScreen({ navigation }) {
             setImage(result.assets[0].uri);
         }
     };
+
+
+
+
+    const signUP = async () => {
+
+        // setLoading(true)
+
+        //  console.log("In the signUp func")
+
+        if (!nameSignUp || !emailSignUp || !passwordSignUp || !confirmPasswordSignUp) {
+
+            console.log("A user Failiure test toast shall be shown")
+
+            toast.show({
+                title: "failiure",
+                description: "Please fill all the required fields",
+                status: "failed",
+                duration: 10000,
+                isClosable: true,
+                placement: "bottom",          // "top", "bottom", "top-right", "bottom-left", etc.
+            });
+
+
+            // setLoading(false)
+            return;
+
+        }
+
+        if (passwordSignUp != confirmPasswordSignUp) {
+
+            console.log("Passwords do not match")
+            toast.show({
+                title: "Error",
+                description: "Passwords do not match",
+                status: "failed",
+                duration: 4000,
+                isClosable: true,
+                placement: "bottom",          // "top", "bottom", "top-right", "bottom-left", etc.
+            });
+
+            return;
+        }
+
+        console.log("We passed the ifs")
+
+        try {
+            const confiq = {
+                headers: {
+                    "Content-type": "application/json",
+                }
+            }
+
+            const { data } = await axios.post("/api/user", { nameSignUp, emailSignUp, emailSignUp }, confiq);
+
+            console.log("register was succesful");
+
+            localStorage.setItem('userInfo', JSON.stringify(data));
+
+            // if registration was successfull redirekt the user to the chat screen. 
+
+        } catch (error) {
+
+            console.log("Error when registering new user")
+
+
+        }
+
+    }
+
+
+    const logIn = async () => {
+
+        if (!emailLogIn || !passwordLogIn) {
+
+
+            console.log("fill all fields")
+
+            toast.show({
+                title: "failiure",
+                description: "Please fill all the required fields",
+                status: "failed",
+                duration: 10000,
+                isClosable: true,
+                placement: "bottom",
+            });
+
+            return;
+
+        }
+
+        try {
+            const confiq = {
+                headers: {
+                    "Content-type": "application/json",
+                }
+            }
+
+            const { data } = await axios.post("/api/user/login", { emailLogIn, passwordLogIn }, confiq);
+
+            console.log("logIn  was succesful");
+
+            localStorage.setItem('userInfo', JSON.stringify(data));
+
+            // if log in  was successfull redirekt the user to the chat screen. 
+
+        } catch (error) {
+
+            console.log("Error when loggin in the user")
+
+
+        }
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     const renderLoginForm = () => (
@@ -92,7 +217,7 @@ export default function LogInSignUpScreen({ navigation }) {
                 />
             </Box>
 
-            <Button style={styles.loginButton} colorScheme="blue">
+            <Button style={styles.loginButton} colorScheme="blue" onPress={logIn}>
                 Login
             </Button>
             <Button style={styles.guestButton} colorScheme="red">
@@ -177,7 +302,7 @@ export default function LogInSignUpScreen({ navigation }) {
 
             </Box>
 
-            <Button style={styles.signUpButton} colorScheme="blue">
+            <Button style={styles.signUpButton} colorScheme="blue" onPress={signUP}>
                 Sign Up
             </Button>
         </VStack>
