@@ -34,52 +34,70 @@ export default function HomePage({ navigation }) {
 
   const handleClick = () => setShow(!show);
 
-  const postDetails = (pics) => {
+  const postDetails = async (imageUri) => {
     setLoading(true);
-    if (pics === undefined) {
+    if (!imageUri) {
       toast({
         title: "Please select an image",
         status: "warning",
         duration: 5000,
         isClosable: true,
-        position: "bottom",
-      });
-      return;
-    }
-
-    // Check if the file is an image (jpeg or png)
-    if (pics.type === "image/jpeg" || pics.type === "image/png") {
-      const data = new FormData();
-      data.append("file", pics);
-      data.append("upload_preset", "chat-app"); // Set your Cloudinary upload preset here
-      data.append("cloud_name", "dpfocfuir"); // Set your Cloudinary cloud name here
-
-      fetch("https://api.cloudinary.com/v1_1/dpfocfuir/image/upload", {
-        method: "post",
-        body: data,
-      })
-        .then((res) => res.json()) // Parse the JSON response
-        .then((data) => {
-          // Log the URL of the uploaded image
-          const imageUrl = data.url; // This is where you get the URL of the uploaded image
-          console.log("Image uploaded successfully:", imageUrl);
-          setPic(imageUrl); // Set the image URL to the state
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.log("Error uploading image:", err);
-          setLoading(false);
-        });
-    } else {
-      toast({
-        title: "Please select a valid image (JPEG/PNG)",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
+        placement: "bottom", // Corrected placement
       });
       setLoading(false);
       return;
+    }
+
+    const data = new FormData();
+    try {
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      data.append("file", blob, "upload.jpg"); // Pass blob and filename
+      data.append("upload_preset", "chat-app");
+      data.append("cloud_name", "dpfocfuir");
+
+      const cloudinaryResponse = await fetch(
+        `https://api.cloudinary.com/v1_1/dpfocfuir/image/upload`,
+        {
+          method: "POST",
+          body: data,
+        }
+      );
+
+      const result = await cloudinaryResponse.json();
+
+      if (result && result.secure_url) {
+        console.log("Cloudinary Upload Success:", result); // Log the entire result on success
+        setPic(result.secure_url);
+        toast.show({
+          title: "Image uploaded!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          placement: "bottom",
+        });
+      } else {
+        console.error("Cloudinary Upload Failed:", result); // Log the entire result on failure
+        toast.show({
+          title: "Upload failed",
+          description: result?.error?.message || "Unknown error",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          placement: "bottom",
+        });
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.show({
+        title: "Error uploading image",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        placement: "bottom",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -88,10 +106,11 @@ export default function HomePage({ navigation }) {
   const pickImage = async () => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
+    if (!permissionResult.granted) {
       alert("Permission to access camera roll is required!");
       return;
     }
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -100,7 +119,9 @@ export default function HomePage({ navigation }) {
     });
 
     if (!result.canceled) {
-      setPic(result.assets[0].uri); // Set image URI to pic state
+      const imageUri = result.assets[0].uri;
+      setPic(imageUri); // Update state with image URI
+      await postDetails(imageUri); // Call function to upload to Cloudinary
     }
   };
 
@@ -169,7 +190,8 @@ export default function HomePage({ navigation }) {
               setShowConfirmPassword={setShowConfirmPassword}
               onSignup={handleSignup}
               onPickImage={pickImage}
-              image={pic} // Pass the pic state as the image to Signup component
+              image={pic}
+              isLoading={loading}
             />
           )}
         </Box>

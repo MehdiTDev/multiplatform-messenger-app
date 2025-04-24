@@ -92,11 +92,12 @@ export default function Signup({
         >
           Choose File
         </Button>
+
+        {/* Center the image */}
         {image && (
-          <Image
-            source={{ uri: image }}
-            style={{ width: 100, height: 100, marginTop: 10, borderRadius: 50 }}
-          />
+          <Box style={styles.imageContainer}>
+            <Image source={{ uri: image }} style={styles.image} />
+          </Box>
         )}
       </Box>
 
@@ -111,4 +112,14 @@ const styles = StyleSheet.create({
   label: { marginBottom: 4 },
   uploadButton: { marginTop: 4 },
   signUpButton: { marginTop: 8 },
+  imageContainer: {
+    alignItems: "center",
+    marginTop: 10,
+  },
+
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
 });
