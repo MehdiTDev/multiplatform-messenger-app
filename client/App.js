@@ -24,7 +24,6 @@ export default function App() {
       >
         <Stack.Screen name="ChatPage" component={ChatPage} />
         <Stack.Screen name="HomePage" component={HomePage} />
-        <Stack.Screen name="TestPage" component={TestPage} />
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
