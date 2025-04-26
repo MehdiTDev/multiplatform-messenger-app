@@ -77,7 +77,7 @@ export default function Login({ navigation }) {
     <VStack space="4">
       <Box>
         <Text style={styles.label}>
-          Email Address <Text color="red.500">*</Text>
+          Email Address <Text style={styles.required}>*</Text>
         </Text>
         <Input
           placeholder="Enter Your Email Address"
@@ -88,7 +88,7 @@ export default function Login({ navigation }) {
 
       <Box>
         <Text style={styles.label}>
-          Password <Text color="red.500">*</Text>
+          Password <Text style={styles.required}>*</Text>
         </Text>
         <Input
           placeholder="Enter password"
@@ -97,7 +97,7 @@ export default function Login({ navigation }) {
           type={showPassword ? "text" : "password"}
           InputRightElement={
             <Pressable onPress={() => setShowPassword(!showPassword)}>
-              <Text px="3" color="blue.500">
+              <Text style={styles.toggleText}>
                 {showPassword ? "Hide" : "Show"}
               </Text>
             </Pressable>
@@ -117,7 +117,22 @@ export default function Login({ navigation }) {
   );
 }
 
+// 🧹 All styles here
 const styles = StyleSheet.create({
-  label: { marginBottom: 4 },
-  loginButton: { marginTop: 8 },
+  label: {
+    marginBottom: 4,
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  required: {
+    color: "red",
+  },
+  loginButton: {
+    marginTop: 8,
+  },
+  toggleText: {
+    paddingHorizontal: 12,
+    color: "#3b82f6", // Tailwind's blue-500
+    fontWeight: "500",
+  },
 });

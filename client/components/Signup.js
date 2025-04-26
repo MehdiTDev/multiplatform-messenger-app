@@ -19,7 +19,7 @@ export default function Signup({ navigation }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [pic, setPic] = useState(null);
+  const [pic, setPic] = useState(null); // State to store the image URI
   const [loading, setLoading] = useState(false);
 
   const toast = useToast();
@@ -27,12 +27,12 @@ export default function Signup({ navigation }) {
   const postDetails = async (imageUri) => {
     setLoading(true);
     if (!imageUri) {
-      toast.show({
+      toast({
         title: "Please select an image",
         status: "warning",
         duration: 5000,
         isClosable: true,
-        placement: "bottom",
+        placement: "bottom", // Corrected placement
       });
       setLoading(false);
       return;
@@ -42,7 +42,7 @@ export default function Signup({ navigation }) {
     try {
       const response = await fetch(imageUri);
       const blob = await response.blob();
-      data.append("file", blob, "upload.jpg");
+      data.append("file", blob, "upload.jpg"); // Pass blob and filename
       data.append("upload_preset", "chat-app");
       data.append("cloud_name", "dpfocfuir");
 
@@ -57,6 +57,7 @@ export default function Signup({ navigation }) {
       const result = await cloudinaryResponse.json();
 
       if (result && result.secure_url) {
+        console.log("Cloudinary Upload Success:", result); // Log the entire result on success
         setPic(result.secure_url);
         toast.show({
           title: "Image uploaded!",
@@ -66,6 +67,7 @@ export default function Signup({ navigation }) {
           placement: "bottom",
         });
       } else {
+        console.error("Cloudinary Upload Failed:", result); // Log the entire result on failure
         toast.show({
           title: "Upload failed",
           description: result?.error?.message || "Unknown error",
@@ -76,6 +78,7 @@ export default function Signup({ navigation }) {
         });
       }
     } catch (error) {
+      console.error("Upload error:", error);
       toast.show({
         title: "Error uploading image",
         status: "error",
@@ -105,8 +108,8 @@ export default function Signup({ navigation }) {
 
     if (!result.canceled) {
       const imageUri = result.assets[0].uri;
-      setPic(imageUri);
-      await postDetails(imageUri);
+      setPic(imageUri); // Update state with image URI
+      await postDetails(imageUri); // Call function to upload to Cloudinary
     }
   };
 
@@ -115,27 +118,29 @@ export default function Signup({ navigation }) {
 
     if (!name || !email || !password || !confirmPassword) {
       toast.show({
-        title: "Failure",
+        title: "failure",
         description: "Please fill all the required fields",
-        status: "error",
+        status: "failed",
         duration: 1000,
         isClosable: true,
         placement: "bottom",
       });
+
       setLoading(false);
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (password != confirmPassword) {
       toast.show({
         title: "Error",
         description: "Passwords do not match",
-        status: "error",
+        status: "failed",
         duration: 1000,
         isClosable: true,
         placement: "bottom",
       });
-      setLoading(false);
+
+      setLoading(false); // not in the tutorials
       return;
     }
 
@@ -154,8 +159,10 @@ export default function Signup({ navigation }) {
 
       localStorage.setItem("userInfo", JSON.stringify(data));
 
+      setLoading(false);
+
       toast.show({
-        title: "Success",
+        title: "success",
         description: "Registration was successful",
         status: "success",
         duration: 1000,
@@ -165,15 +172,30 @@ export default function Signup({ navigation }) {
 
       navigation.navigate("ChatPage");
     } catch (error) {
-      toast.show({
-        title: "Error",
-        description: error.response?.data?.message || error.message,
-        status: "error",
-        duration: 1000,
-        isClosable: true,
-        placement: "bottom",
-      });
-    } finally {
+      if (error.response && error.response.data) {
+        console.log(error.response.data); // Server-side error message
+
+        toast.show({
+          title: "Error",
+          description: error.response.data.message,
+          status: "failed",
+          duration: 1000,
+          isClosable: true,
+          placement: "bottom",
+        });
+      } else {
+        console.log(error.message); // Generic error, like network issue
+
+        toast.show({
+          title: "Network error",
+          description: error.message,
+          status: "failed",
+          duration: 1000,
+          isClosable: true,
+          placement: "bottom",
+        });
+      }
+
       setLoading(false);
     }
   };
@@ -182,7 +204,7 @@ export default function Signup({ navigation }) {
     <VStack space="4">
       <Box>
         <Text style={styles.label}>
-          Name <Text color="red.500">*</Text>
+          Name <Text style={styles.required}>*</Text>
         </Text>
         <Input
           placeholder="Enter Your Name"
@@ -193,7 +215,7 @@ export default function Signup({ navigation }) {
 
       <Box>
         <Text style={styles.label}>
-          Email Address <Text color="red.500">*</Text>
+          Email Address <Text style={styles.required}>*</Text>
         </Text>
         <Input
           placeholder="Enter Your Email Address"
@@ -204,7 +226,7 @@ export default function Signup({ navigation }) {
 
       <Box>
         <Text style={styles.label}>
-          Password <Text color="red.500">*</Text>
+          Password <Text style={styles.required}>*</Text>
         </Text>
         <Input
           placeholder="Enter Password"
@@ -213,7 +235,7 @@ export default function Signup({ navigation }) {
           type={showPassword ? "text" : "password"}
           InputRightElement={
             <Pressable onPress={() => setShowPassword(!showPassword)}>
-              <Text px="3" color="blue.500">
+              <Text style={styles.toggleText}>
                 {showPassword ? "Hide" : "Show"}
               </Text>
             </Pressable>
@@ -223,10 +245,10 @@ export default function Signup({ navigation }) {
 
       <Box>
         <Text style={styles.label}>
-          Confirm Password <Text color="red.500">*</Text>
+          Confirm Password <Text style={styles.required}>*</Text>
         </Text>
         <Input
-          placeholder="Confirm Password"
+          placeholder="Confirm password"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           type={showConfirmPassword ? "text" : "password"}
@@ -234,7 +256,7 @@ export default function Signup({ navigation }) {
             <Pressable
               onPress={() => setShowConfirmPassword(!showConfirmPassword)}
             >
-              <Text px="3" color="blue.500">
+              <Text style={styles.toggleText}>
                 {showConfirmPassword ? "Hide" : "Show"}
               </Text>
             </Pressable>
@@ -272,9 +294,20 @@ export default function Signup({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  label: { marginBottom: 4 },
-  uploadButton: { marginTop: 4 },
-  signUpButton: { marginTop: 8 },
+  label: {
+    marginBottom: 4,
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  required: {
+    color: "red",
+  },
+  uploadButton: {
+    marginTop: 4,
+  },
+  signUpButton: {
+    marginTop: 8,
+  },
   imageContainer: {
     alignItems: "center",
     marginTop: 10,
@@ -283,5 +316,10 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
+  },
+  toggleText: {
+    paddingHorizontal: 12,
+    color: "#3b82f6", // Tailwind's blue-500
+    fontWeight: "500",
   },
 });
