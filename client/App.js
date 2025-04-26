@@ -3,8 +3,9 @@ import { StyleSheet } from "react-native";
 import { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { NativeBaseProvider } from "native-base";
 
-// Screens (renamed)
+// Screens
 import ChatPage from "./Screens/ChatPage";
 import HomePage from "./Screens/HomePage";
 
@@ -16,16 +17,18 @@ export default function App() {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="HomePage"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="ChatPage" component={ChatPage} />
-        <Stack.Screen name="HomePage" component={HomePage} />
-      </Stack.Navigator>
-      <StatusBar style="auto" />
-    </NavigationContainer>
+    <NativeBaseProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="HomePage"
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="ChatPage" component={ChatPage} />
+          <Stack.Screen name="HomePage" component={HomePage} />
+        </Stack.Navigator>
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    </NativeBaseProvider>
   );
 }
 
