@@ -18,28 +18,24 @@ export default function Login({
   setPassword,
   showPassword,
   setShowPassword,
-  onLogin,
   onGuest,
-  isLoading,
   setLoading,
   navigation,
 }) {
   const toast = useToast();
 
   const submitHandler = async () => {
-    // your logIn function here
-
     setLoading(true);
+
     if (!email || !password) {
       toast.show({
-        title: "failure",
+        title: "Failure",
         description: "Please fill all the required fields",
-        status: "failed",
+        status: "error",
         duration: 1000,
         isClosable: true,
         placement: "bottom",
       });
-
       setLoading(false);
       return;
     }
@@ -58,40 +54,27 @@ export default function Login({
       );
 
       toast.show({
-        title: "success",
-        description: "logged in successfully",
-        status: "Succeeded",
-        duration: 10000,
+        title: "Success",
+        description: "Logged in successfully",
+        status: "success",
+        duration: 3000,
         isClosable: true,
         placement: "bottom",
       });
 
       localStorage.setItem("userInfo", JSON.stringify(data));
 
-      // if log in  was successfull redirekt the user to the chat screen.
-
       navigation.navigate("ChatPage");
     } catch (error) {
-      if (error.response && error.response.data) {
-        toast.show({
-          title: "Error",
-          description: error.response.data.message,
-          status: "failed",
-          duration: 1000,
-          isClosable: true,
-          placement: "bottom",
-        });
-      } else {
-        toast.show({
-          title: "Network error",
-          description: error.message,
-          status: "failed",
-          duration: 1000,
-          isClosable: true,
-          placement: "bottom",
-        });
-      }
-
+      toast.show({
+        title: "Error",
+        description: error.response?.data?.message || error.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        placement: "bottom",
+      });
+    } finally {
       setLoading(false);
     }
   };
@@ -135,6 +118,7 @@ export default function Login({
       >
         Login
       </Button>
+
       <Button style={styles.guestButton} colorScheme="red" onPress={onGuest}>
         Get Guest User Credentials
       </Button>
@@ -143,7 +127,13 @@ export default function Login({
 }
 
 const styles = StyleSheet.create({
-  label: { marginBottom: 4 },
-  loginButton: { marginTop: 8 },
-  guestButton: { marginTop: 8 },
+  label: {
+    marginBottom: 4,
+  },
+  loginButton: {
+    marginTop: 8,
+  },
+  guestButton: {
+    marginTop: 8,
+  },
 });

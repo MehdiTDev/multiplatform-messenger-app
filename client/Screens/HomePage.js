@@ -10,13 +10,11 @@ import { StyleSheet } from "react-native";
 import { useState } from "react";
 import Login from "../components/Login";
 import Signup from "../components/Signup";
-import * as ImagePicker from "expo-image-picker";
-import axios from "axios";
-//import { useHistory } from "react-router-dom"
 
 export default function HomePage({ navigation }) {
   const [selectedTab, setSelectedTab] = useState("Login");
   const toast = useToast();
+
   // Login states
   const [emailLogIn, setEmailLogIn] = useState("");
   const [passwordLogIn, setPasswordLogIn] = useState("");
@@ -30,11 +28,7 @@ export default function HomePage({ navigation }) {
   const [showPasswordSignUp, setShowPasswordSignUp] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [pic, setPic] = useState(null); // State to store the image URI
-  const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
-  //const history = useHistory()
-
-  const handleClick = () => setShow(!show);
 
   return (
     <NativeBaseProvider>
