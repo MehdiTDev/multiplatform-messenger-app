@@ -26,7 +26,7 @@ export default function ChatPage({ navigation }) {
   const [chats, setChats] = useState([
     {
       id: 1,
-      name: "Piyush",
+      name: "Mehdi",
       lastMessage: "woooo",
       time: "10:30 AM",
       unread: 2,
