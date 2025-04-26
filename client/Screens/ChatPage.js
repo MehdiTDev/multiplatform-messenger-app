@@ -13,6 +13,7 @@ import {
   ScrollView,
 } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
+import { StyleSheet } from "react-native";
 
 export default function ChatPage({ navigation }) {
   const [user, setUser] = useState(null);
@@ -375,3 +376,53 @@ export default function ChatPage({ navigation }) {
     </HStack>
   );
 }
+
+const styles = StyleSheet.create({
+  searchBox: {
+    padding: 12,
+    backgroundColor: "white",
+  },
+  groupChatButton: {
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    backgroundColor: "#00BFFF",
+    borderRadius: 10,
+    paddingVertical: 8,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  myChatsHeader: {
+    paddingHorizontal: 12,
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: "coolGray.800",
+  },
+  chatListItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "coolGray.100",
+  },
+  chatHeader: {
+    padding: 12,
+    space: 8,
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "coolGray.200",
+    backgroundColor: "white",
+  },
+  messageBox: {
+    padding: 12,
+    marginBottom: 8,
+    borderRadius: 12,
+    maxWidth: "80%",
+  },
+  messageInput: {
+    flex: 1,
+    paddingVertical: 8,
+    backgroundColor: "coolGray.100",
+    borderColor: "coolGray.200",
+    borderRadius: 20,
+  },
+});
