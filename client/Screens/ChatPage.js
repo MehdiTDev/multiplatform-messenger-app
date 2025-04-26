@@ -148,6 +148,26 @@ export default function ChatPage({ navigation }) {
             />
           </Box>
 
+          {/* Create Group Chat Button */}
+          <Box px={3} pt={2}>
+            <Pressable
+              onPress={() => {
+                // Navigate or open modal to create group chat
+                console.log("Create Group Chat Pressed");
+                // navigation.navigate('CreateGroupChat') // if you have a screen
+              }}
+              bg="#00BFFF"
+              borderRadius={10}
+              py={2}
+              alignItems="center"
+              mb={3}
+            >
+              <Text color="white" fontWeight="bold">
+                + Create Group Chat
+              </Text>
+            </Pressable>
+          </Box>
+
           {/* My Chats section */}
           <Box px={3}>
             <Text fontSize="lg" fontWeight="bold" mb={2} color="coolGray.800">
