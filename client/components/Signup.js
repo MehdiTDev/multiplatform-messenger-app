@@ -1,6 +1,8 @@
 import React from "react";
-import { Box, Button, Input, Text, VStack, Pressable } from "native-base";
+import { Box, Button, Input, Text, VStack, Pressable, useToast } from "native-base";
 import { StyleSheet, Image } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
 
 export default function Signup({
   name,
@@ -18,7 +20,203 @@ export default function Signup({
   onSignup,
   onPickImage,
   image,
+  setPic,
+  isLoading,
+  setLoading
 }) {
+
+  const toast = useToast();
+
+  const postDetails = async (imageUri) => {
+    setLoading(true);
+    if (!imageUri) {
+      toast({
+        title: "Please select an image",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        placement: "bottom", // Corrected placement
+      });
+      setLoading(false);
+      return;
+    }
+
+    const data = new FormData();
+    try {
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      data.append("file", blob, "upload.jpg"); // Pass blob and filename
+      data.append("upload_preset", "chat-app");
+      data.append("cloud_name", "dpfocfuir");
+
+      const cloudinaryResponse = await fetch(
+        `https://api.cloudinary.com/v1_1/dpfocfuir/image/upload`,
+        {
+          method: "POST",
+          body: data,
+        }
+      );
+
+      const result = await cloudinaryResponse.json();
+
+      if (result && result.secure_url) {
+        console.log("Cloudinary Upload Success:", result); // Log the entire result on success
+        setPic(result.secure_url);
+        toast.show({
+          title: "Image uploaded!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          placement: "bottom",
+        });
+      } else {
+        console.error("Cloudinary Upload Failed:", result); // Log the entire result on failure
+        toast.show({
+          title: "Upload failed",
+          description: result?.error?.message || "Unknown error",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          placement: "bottom",
+        });
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.show({
+        title: "Error uploading image",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        placement: "bottom",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const pickImage = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const imageUri = result.assets[0].uri;
+      setPic(imageUri); // Update state with image URI
+      await postDetails(imageUri); // Call function to upload to Cloudinary
+    }
+  };
+
+  const submitHandler = async () => {
+    // your signUp function here
+
+    setLoading(true)
+
+
+    if (!name || !email || !password || !confirmPassword) {
+
+      toast.show({
+        title: "failure",
+        description: "Please fill all the required fields",
+        status: "failed",
+        duration: 1000,
+        isClosable: true,
+        placement: "bottom",
+      });
+
+      setLoading(false)
+      return;
+
+    }
+
+    if (password != confirmPassword) {
+
+      toast.show({
+        title: "Error",
+        description: "Passwords do not match",
+        status: "failed",
+        duration: 1000,
+        isClosable: true,
+        placement: "bottom",
+      });
+
+      setLoading(false) // not in the tutorials 
+      return;
+    }
+
+
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        }
+      }
+
+      const { data } = await axios.post("http://localhost:5000/api/user", { name, email, password, image }, config);
+
+
+      localStorage.setItem('userInfo', JSON.stringify(data));
+
+      setLoading(false)
+      // history.push('/chats')  // if registration was successfull redirekt the user to the chat screen.  
+
+      toast.show({
+        title: "success",
+        description: "Registration was successful",
+        status: "success",
+        duration: 1000,
+        isClosable: true,
+        placement: "bottom",
+      });
+
+      navigation.navigate("ChatPage");
+
+
+
+    } catch (error) {
+
+      if (error.response && error.response.data) {
+        console.log(error.response.data); // Server-side error message
+
+        toast.show({
+          title: "Error",
+          description: error.response.data.message,
+          status: "failed",
+          duration: 1000,
+          isClosable: true,
+          placement: "bottom",
+        });
+
+
+
+      } else {
+        console.log(error.message); // Generic error, like network issue
+
+        toast.show({
+          title: "Network error",
+          description: error.message,
+          status: "failed",
+          duration: 1000,
+          isClosable: true,
+          placement: "bottom",
+        });
+      }
+
+      setLoading(false)
+
+    }
+
+  };
+
   return (
     <VStack space="4">
       <Box>
@@ -88,7 +286,7 @@ export default function Signup({
         <Button
           variant="outline"
           style={styles.uploadButton}
-          onPress={onPickImage}
+          onPress={pickImage}
         >
           Choose File
         </Button>
@@ -101,7 +299,7 @@ export default function Signup({
         )}
       </Box>
 
-      <Button style={styles.signUpButton} colorScheme="blue" onPress={onSignup}>
+      <Button style={styles.signUpButton} colorScheme="blue" onPress={submitHandler}>
         Sign Up
       </Button>
     </VStack>

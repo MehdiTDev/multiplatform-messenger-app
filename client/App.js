@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 // Screens (renamed)
 import ChatPage from "./Screens/ChatPage";
 import HomePage from "./Screens/HomePage";
+import TestPage from "./components/TestPage";
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,7 @@ export default function App() {
       >
         <Stack.Screen name="ChatPage" component={ChatPage} />
         <Stack.Screen name="HomePage" component={HomePage} />
+        <Stack.Screen name="TestPage" component={TestPage} />
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>

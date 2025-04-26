@@ -11,127 +11,42 @@ import { useState } from "react";
 import Login from "../components/Login";
 import Signup from "../components/Signup";
 import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
+//import { useHistory } from "react-router-dom"
 
 export default function HomePage({ navigation }) {
   const [selectedTab, setSelectedTab] = useState("Login");
-
+  const toast = useToast();
   // Login states
   const [emailLogIn, setEmailLogIn] = useState("");
   const [passwordLogIn, setPasswordLogIn] = useState("");
   const [showPasswordLogIn, setShowPasswordLogIn] = useState(false);
 
   // Signup states
-  const [nameSignUp, setNameSignUp] = useState("");
-  const [emailSignUp, setEmailSignUp] = useState("");
-  const [passwordSignUp, setPasswordSignUp] = useState("");
-  const [confirmPasswordSignUp, setConfirmPasswordSignUp] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPasswordSignUp, setShowPasswordSignUp] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [pic, setPic] = useState(null); // State to store the image URI
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
-  const toast = useToast();
+  //const history = useHistory()
 
   const handleClick = () => setShow(!show);
 
-  const postDetails = async (imageUri) => {
-    setLoading(true);
-    if (!imageUri) {
-      toast({
-        title: "Please select an image",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        placement: "bottom", // Corrected placement
-      });
-      setLoading(false);
-      return;
-    }
 
-    const data = new FormData();
-    try {
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
-      data.append("file", blob, "upload.jpg"); // Pass blob and filename
-      data.append("upload_preset", "chat-app");
-      data.append("cloud_name", "dpfocfuir");
 
-      const cloudinaryResponse = await fetch(
-        `https://api.cloudinary.com/v1_1/dpfocfuir/image/upload`,
-        {
-          method: "POST",
-          body: data,
-        }
-      );
-
-      const result = await cloudinaryResponse.json();
-
-      if (result && result.secure_url) {
-        console.log("Cloudinary Upload Success:", result); // Log the entire result on success
-        setPic(result.secure_url);
-        toast.show({
-          title: "Image uploaded!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          placement: "bottom",
-        });
-      } else {
-        console.error("Cloudinary Upload Failed:", result); // Log the entire result on failure
-        toast.show({
-          title: "Upload failed",
-          description: result?.error?.message || "Unknown error",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          placement: "bottom",
-        });
-      }
-    } catch (error) {
-      console.error("Upload error:", error);
-      toast.show({
-        title: "Error uploading image",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        placement: "bottom",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const submitHandler = () => {};
-
-  const pickImage = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      alert("Permission to access camera roll is required!");
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      const imageUri = result.assets[0].uri;
-      setPic(imageUri); // Update state with image URI
-      await postDetails(imageUri); // Call function to upload to Cloudinary
-    }
-  };
-
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // your logIn function here
   };
 
-  const handleSignup = () => {
+
+  const handleSignup = async () => {
     // your signUp function here
   };
+
 
   return (
     <NativeBaseProvider>
@@ -171,27 +86,31 @@ export default function HomePage({ navigation }) {
               setPassword={setPasswordLogIn}
               showPassword={showPasswordLogIn}
               setShowPassword={setShowPasswordLogIn}
-              onLogin={handleLogin}
-              onGuest={() => {}}
+              onLogin={() => { }}
+              onGuest={() => { navigation.navigate("TestPage"); }}
+              isLoading={loading}
+              setLoading={setLoading}
             />
           ) : (
             <Signup
-              name={nameSignUp}
-              setName={setNameSignUp}
-              email={emailSignUp}
-              setEmail={setEmailSignUp}
-              password={passwordSignUp}
-              setPassword={setPasswordSignUp}
-              confirmPassword={confirmPasswordSignUp}
-              setConfirmPassword={setConfirmPasswordSignUp}
+              name={name}
+              setName={setName}
+              email={email}
+              setEmail={setEmail}
+              password={password}
+              setPassword={setPassword}
+              confirmPassword={confirmPassword}
+              setConfirmPassword={setConfirmPassword}
               showPassword={showPasswordSignUp}
               setShowPassword={setShowPasswordSignUp}
               showConfirmPassword={showConfirmPassword}
               setShowConfirmPassword={setShowConfirmPassword}
-              onSignup={handleSignup}
-              onPickImage={pickImage}
+              onSignup={() => { }}
+              onPickImage={() => { }}
               image={pic}
+              setPic={setPic}
               isLoading={loading}
+              setLoading={setLoading}
             />
           )}
         </Box>
