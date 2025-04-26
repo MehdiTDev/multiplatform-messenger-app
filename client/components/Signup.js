@@ -1,29 +1,26 @@
-import React from "react";
-import { Box, Button, Input, Text, VStack, Pressable, useToast } from "native-base";
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Input,
+  Text,
+  VStack,
+  Pressable,
+  useToast,
+} from "native-base";
 import { StyleSheet, Image } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 
-export default function Signup({
-  name,
-  setName,
-  email,
-  setEmail,
-  password,
-  setPassword,
-  confirmPassword,
-  setConfirmPassword,
-  showPassword,
-  setShowPassword,
-  showConfirmPassword,
-  setShowConfirmPassword,
-  onSignup,
-  onPickImage,
-  image,
-  setPic,
-  isLoading,
-  setLoading
-}) {
+export default function Signup({ navigation }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [pic, setPic] = useState(null); // State to store the image URI
+  const [loading, setLoading] = useState(false);
 
   const toast = useToast();
 
@@ -117,13 +114,9 @@ export default function Signup({
   };
 
   const submitHandler = async () => {
-    // your signUp function here
-
-    setLoading(true)
-
+    setLoading(true);
 
     if (!name || !email || !password || !confirmPassword) {
-
       toast.show({
         title: "failure",
         description: "Please fill all the required fields",
@@ -133,13 +126,11 @@ export default function Signup({
         placement: "bottom",
       });
 
-      setLoading(false)
+      setLoading(false);
       return;
-
     }
 
     if (password != confirmPassword) {
-
       toast.show({
         title: "Error",
         description: "Passwords do not match",
@@ -149,25 +140,26 @@ export default function Signup({
         placement: "bottom",
       });
 
-      setLoading(false) // not in the tutorials 
+      setLoading(false); // not in the tutorials
       return;
     }
-
 
     try {
       const config = {
         headers: {
           "Content-type": "application/json",
-        }
-      }
+        },
+      };
 
-      const { data } = await axios.post("http://localhost:5000/api/user", { name, email, password, image }, config);
+      const { data } = await axios.post(
+        "http://localhost:5000/api/user",
+        { name, email, password, pic },
+        config
+      );
 
+      localStorage.setItem("userInfo", JSON.stringify(data));
 
-      localStorage.setItem('userInfo', JSON.stringify(data));
-
-      setLoading(false)
-      // history.push('/chats')  // if registration was successfull redirekt the user to the chat screen.  
+      setLoading(false);
 
       toast.show({
         title: "success",
@@ -179,11 +171,7 @@ export default function Signup({
       });
 
       navigation.navigate("ChatPage");
-
-
-
     } catch (error) {
-
       if (error.response && error.response.data) {
         console.log(error.response.data); // Server-side error message
 
@@ -195,9 +183,6 @@ export default function Signup({
           isClosable: true,
           placement: "bottom",
         });
-
-
-
       } else {
         console.log(error.message); // Generic error, like network issue
 
@@ -211,17 +196,15 @@ export default function Signup({
         });
       }
 
-      setLoading(false)
-
+      setLoading(false);
     }
-
   };
 
   return (
     <VStack space="4">
       <Box>
         <Text style={styles.label}>
-          Name <Text color="red.500">*</Text>
+          Name <Text style={styles.required}>*</Text>
         </Text>
         <Input
           placeholder="Enter Your Name"
@@ -232,7 +215,7 @@ export default function Signup({
 
       <Box>
         <Text style={styles.label}>
-          Email Address <Text color="red.500">*</Text>
+          Email Address <Text style={styles.required}>*</Text>
         </Text>
         <Input
           placeholder="Enter Your Email Address"
@@ -243,7 +226,7 @@ export default function Signup({
 
       <Box>
         <Text style={styles.label}>
-          Password <Text color="red.500">*</Text>
+          Password <Text style={styles.required}>*</Text>
         </Text>
         <Input
           placeholder="Enter Password"
@@ -252,7 +235,7 @@ export default function Signup({
           type={showPassword ? "text" : "password"}
           InputRightElement={
             <Pressable onPress={() => setShowPassword(!showPassword)}>
-              <Text px="3" color="blue.500">
+              <Text style={styles.toggleText}>
                 {showPassword ? "Hide" : "Show"}
               </Text>
             </Pressable>
@@ -262,7 +245,7 @@ export default function Signup({
 
       <Box>
         <Text style={styles.label}>
-          Confirm Password <Text color="red.500">*</Text>
+          Confirm Password <Text style={styles.required}>*</Text>
         </Text>
         <Input
           placeholder="Confirm password"
@@ -273,7 +256,7 @@ export default function Signup({
             <Pressable
               onPress={() => setShowConfirmPassword(!showConfirmPassword)}
             >
-              <Text px="3" color="blue.500">
+              <Text style={styles.toggleText}>
                 {showConfirmPassword ? "Hide" : "Show"}
               </Text>
             </Pressable>
@@ -291,15 +274,19 @@ export default function Signup({
           Choose File
         </Button>
 
-        {/* Center the image */}
-        {image && (
+        {pic && (
           <Box style={styles.imageContainer}>
-            <Image source={{ uri: image }} style={styles.image} />
+            <Image source={{ uri: pic }} style={styles.image} />
           </Box>
         )}
       </Box>
 
-      <Button style={styles.signUpButton} colorScheme="blue" onPress={submitHandler}>
+      <Button
+        style={styles.signUpButton}
+        colorScheme="blue"
+        onPress={submitHandler}
+        isLoading={loading}
+      >
         Sign Up
       </Button>
     </VStack>
@@ -307,17 +294,32 @@ export default function Signup({
 }
 
 const styles = StyleSheet.create({
-  label: { marginBottom: 4 },
-  uploadButton: { marginTop: 4 },
-  signUpButton: { marginTop: 8 },
+  label: {
+    marginBottom: 4,
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  required: {
+    color: "red",
+  },
+  uploadButton: {
+    marginTop: 4,
+  },
+  signUpButton: {
+    marginTop: 8,
+  },
   imageContainer: {
     alignItems: "center",
     marginTop: 10,
   },
-
   image: {
     width: 100,
     height: 100,
     borderRadius: 50,
+  },
+  toggleText: {
+    paddingHorizontal: 12,
+    color: "#3b82f6", // Tailwind's blue-500
+    fontWeight: "500",
   },
 });

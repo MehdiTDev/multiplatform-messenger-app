@@ -1,108 +1,83 @@
-import React from "react";
-import { Box, Button, Input, Text, VStack, Pressable, useToast } from "native-base";
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Input,
+  Text,
+  VStack,
+  Pressable,
+  useToast,
+} from "native-base";
 import { StyleSheet } from "react-native";
 import axios from "axios";
 
-export default function Login({
-  email,
-  setEmail,
-  password,
-  setPassword,
-  showPassword,
-  setShowPassword,
-  onLogin,
-  onGuest,
-  isLoading,
-  setLoading
-}) {
+export default function Login({ navigation }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const toast = useToast();
 
   const submitHandler = async () => {
-    // your logIn function here
+    setLoading(true);
 
-    setLoading(true)
     if (!email || !password) {
-
       toast.show({
-        title: "failure",
+        title: "Failure",
         description: "Please fill all the required fields",
-        status: "failed",
+        status: "error",
         duration: 1000,
         isClosable: true,
         placement: "bottom",
       });
-
-      setLoading(false)
+      setLoading(false);
       return;
-
     }
 
     try {
       const config = {
         headers: {
           "Content-type": "application/json",
-        }
-      }
+        },
+      };
 
-      const { data } = await axios.post("http://localhost:5000/api/user/login", { email, password }, config);
-
+      const { data } = await axios.post(
+        "http://localhost:5000/api/user/login",
+        { email, password },
+        config
+      );
 
       toast.show({
-        title: "success",
-        description: "logged in successfully",
-        status: "Succeeded",
-        duration: 10000,
+        title: "Success",
+        description: "Logged in successfully",
+        status: "success",
+        duration: 3000,
         isClosable: true,
         placement: "bottom",
       });
 
-      localStorage.setItem('userInfo', JSON.stringify(data));
-
-      // if log in  was successfull redirekt the user to the chat screen.
-
+      localStorage.setItem("userInfo", JSON.stringify(data));
       navigation.navigate("ChatPage");
-
-
     } catch (error) {
-
-
-      if (error.response && error.response.data) {
-
-        toast.show({
-          title: "Error",
-          description: error.response.data.message,
-          status: "failed",
-          duration: 1000,
-          isClosable: true,
-          placement: "bottom",
-        });
-
-
-
-      } else {
-
-        toast.show({
-          title: "Network error",
-          description: error.message,
-          status: "failed",
-          duration: 1000,
-          isClosable: true,
-          placement: "bottom",
-        });
-      }
-
-      setLoading(false)
+      toast.show({
+        title: "Error",
+        description: error.response?.data?.message || error.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        placement: "bottom",
+      });
+    } finally {
+      setLoading(false);
     }
-
   };
-
 
   return (
     <VStack space="4">
       <Box>
         <Text style={styles.label}>
-          Email Address <Text color="red.500">*</Text>
+          Email Address <Text style={styles.required}>*</Text>
         </Text>
         <Input
           placeholder="Enter Your Email Address"
@@ -113,7 +88,7 @@ export default function Login({
 
       <Box>
         <Text style={styles.label}>
-          Password <Text color="red.500">*</Text>
+          Password <Text style={styles.required}>*</Text>
         </Text>
         <Input
           placeholder="Enter password"
@@ -122,7 +97,7 @@ export default function Login({
           type={showPassword ? "text" : "password"}
           InputRightElement={
             <Pressable onPress={() => setShowPassword(!showPassword)}>
-              <Text px="3" color="blue.500">
+              <Text style={styles.toggleText}>
                 {showPassword ? "Hide" : "Show"}
               </Text>
             </Pressable>
@@ -130,18 +105,34 @@ export default function Login({
         />
       </Box>
 
-      <Button style={styles.loginButton} colorScheme="blue" onPress={submitHandler}>
+      <Button
+        style={styles.loginButton}
+        colorScheme="blue"
+        onPress={submitHandler}
+        isLoading={loading}
+      >
         Login
-      </Button>
-      <Button style={styles.guestButton} colorScheme="red" onPress={onGuest}>
-        Get Guest User Credentials
       </Button>
     </VStack>
   );
 }
 
+// 🧹 All styles here
 const styles = StyleSheet.create({
-  label: { marginBottom: 4 },
-  loginButton: { marginTop: 8 },
-  guestButton: { marginTop: 8 },
+  label: {
+    marginBottom: 4,
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  required: {
+    color: "red",
+  },
+  loginButton: {
+    marginTop: 8,
+  },
+  toggleText: {
+    paddingHorizontal: 12,
+    color: "#3b82f6", // Tailwind's blue-500
+    fontWeight: "500",
+  },
 });
