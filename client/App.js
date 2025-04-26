@@ -7,7 +7,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 // Screens (renamed)
 import ChatPage from "./Screens/ChatPage";
 import HomePage from "./Screens/HomePage";
-import TestPage from "./components/TestPage";
 
 const Stack = createNativeStackNavigator();
 
