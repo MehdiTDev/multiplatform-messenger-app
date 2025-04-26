@@ -36,18 +36,6 @@ export default function HomePage({ navigation }) {
 
   const handleClick = () => setShow(!show);
 
-
-
-  const handleLogin = async () => {
-    // your logIn function here
-  };
-
-
-  const handleSignup = async () => {
-    // your signUp function here
-  };
-
-
   return (
     <NativeBaseProvider>
       <Box style={styles.container}>
@@ -86,10 +74,13 @@ export default function HomePage({ navigation }) {
               setPassword={setPasswordLogIn}
               showPassword={showPasswordLogIn}
               setShowPassword={setShowPasswordLogIn}
-              onLogin={() => { }}
-              onGuest={() => { navigation.navigate("TestPage"); }}
+              onLogin={() => {}}
+              onGuest={() => {
+                navigation.navigate("TestPage");
+              }}
               isLoading={loading}
               setLoading={setLoading}
+              navigation={navigation}
             />
           ) : (
             <Signup
@@ -105,12 +96,13 @@ export default function HomePage({ navigation }) {
               setShowPassword={setShowPasswordSignUp}
               showConfirmPassword={showConfirmPassword}
               setShowConfirmPassword={setShowConfirmPassword}
-              onSignup={() => { }}
-              onPickImage={() => { }}
+              onSignup={() => {}}
+              onPickImage={() => {}}
               image={pic}
               setPic={setPic}
               isLoading={loading}
               setLoading={setLoading}
+              navigation={navigation}
             />
           )}
         </Box>

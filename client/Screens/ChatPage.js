@@ -2,18 +2,30 @@ import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function ChatPage({ navigation }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Replace with actual logic
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    // Check if user is logged in
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    if (!userInfo) {
       navigation.navigate("HomePage");
+    } else {
+      setUser(userInfo);
     }
-    console.log("This is the startScreen");
   }, []);
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Text>Checking login status...</Text>
+      <Text>Welcome to the Chat Page, {user.name}!</Text>
+      {/* Add your chat UI components here */}
     </View>
   );
 }

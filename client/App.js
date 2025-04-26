@@ -18,7 +18,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="ChatPage"
+        initialRouteName="HomePage"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="ChatPage" component={ChatPage} />

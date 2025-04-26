@@ -1,5 +1,13 @@
 import React from "react";
-import { Box, Button, Input, Text, VStack, Pressable, useToast } from "native-base";
+import {
+  Box,
+  Button,
+  Input,
+  Text,
+  VStack,
+  Pressable,
+  useToast,
+} from "native-base";
 import { StyleSheet } from "react-native";
 import axios from "axios";
 
@@ -13,17 +21,16 @@ export default function Login({
   onLogin,
   onGuest,
   isLoading,
-  setLoading
+  setLoading,
+  navigation,
 }) {
-
   const toast = useToast();
 
   const submitHandler = async () => {
     // your logIn function here
 
-    setLoading(true)
+    setLoading(true);
     if (!email || !password) {
-
       toast.show({
         title: "failure",
         description: "Please fill all the required fields",
@@ -33,20 +40,22 @@ export default function Login({
         placement: "bottom",
       });
 
-      setLoading(false)
+      setLoading(false);
       return;
-
     }
 
     try {
       const config = {
         headers: {
           "Content-type": "application/json",
-        }
-      }
+        },
+      };
 
-      const { data } = await axios.post("http://localhost:5000/api/user/login", { email, password }, config);
-
+      const { data } = await axios.post(
+        "http://localhost:5000/api/user/login",
+        { email, password },
+        config
+      );
 
       toast.show({
         title: "success",
@@ -57,18 +66,13 @@ export default function Login({
         placement: "bottom",
       });
 
-      localStorage.setItem('userInfo', JSON.stringify(data));
+      localStorage.setItem("userInfo", JSON.stringify(data));
 
       // if log in  was successfull redirekt the user to the chat screen.
 
       navigation.navigate("ChatPage");
-
-
     } catch (error) {
-
-
       if (error.response && error.response.data) {
-
         toast.show({
           title: "Error",
           description: error.response.data.message,
@@ -77,11 +81,7 @@ export default function Login({
           isClosable: true,
           placement: "bottom",
         });
-
-
-
       } else {
-
         toast.show({
           title: "Network error",
           description: error.message,
@@ -92,11 +92,9 @@ export default function Login({
         });
       }
 
-      setLoading(false)
+      setLoading(false);
     }
-
   };
-
 
   return (
     <VStack space="4">
@@ -130,7 +128,11 @@ export default function Login({
         />
       </Box>
 
-      <Button style={styles.loginButton} colorScheme="blue" onPress={submitHandler}>
+      <Button
+        style={styles.loginButton}
+        colorScheme="blue"
+        onPress={submitHandler}
+      >
         Login
       </Button>
       <Button style={styles.guestButton} colorScheme="red" onPress={onGuest}>

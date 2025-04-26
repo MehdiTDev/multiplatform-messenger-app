@@ -1,5 +1,13 @@
 import React from "react";
-import { Box, Button, Input, Text, VStack, Pressable, useToast } from "native-base";
+import {
+  Box,
+  Button,
+  Input,
+  Text,
+  VStack,
+  Pressable,
+  useToast,
+} from "native-base";
 import { StyleSheet, Image } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
@@ -17,14 +25,11 @@ export default function Signup({
   setShowPassword,
   showConfirmPassword,
   setShowConfirmPassword,
-  onSignup,
-  onPickImage,
   image,
   setPic,
-  isLoading,
-  setLoading
+  setLoading,
+  navigation,
 }) {
-
   const toast = useToast();
 
   const postDetails = async (imageUri) => {
@@ -119,11 +124,9 @@ export default function Signup({
   const submitHandler = async () => {
     // your signUp function here
 
-    setLoading(true)
-
+    setLoading(true);
 
     if (!name || !email || !password || !confirmPassword) {
-
       toast.show({
         title: "failure",
         description: "Please fill all the required fields",
@@ -133,13 +136,11 @@ export default function Signup({
         placement: "bottom",
       });
 
-      setLoading(false)
+      setLoading(false);
       return;
-
     }
 
     if (password != confirmPassword) {
-
       toast.show({
         title: "Error",
         description: "Passwords do not match",
@@ -149,25 +150,27 @@ export default function Signup({
         placement: "bottom",
       });
 
-      setLoading(false) // not in the tutorials 
+      setLoading(false); // not in the tutorials
       return;
     }
-
 
     try {
       const config = {
         headers: {
           "Content-type": "application/json",
-        }
-      }
+        },
+      };
 
-      const { data } = await axios.post("http://localhost:5000/api/user", { name, email, password, image }, config);
+      const { data } = await axios.post(
+        "http://localhost:5000/api/user",
+        { name, email, password, image },
+        config
+      );
 
+      localStorage.setItem("userInfo", JSON.stringify(data));
 
-      localStorage.setItem('userInfo', JSON.stringify(data));
-
-      setLoading(false)
-      // history.push('/chats')  // if registration was successfull redirekt the user to the chat screen.  
+      setLoading(false);
+      // history.push('/chats')  // if registration was successfull redirekt the user to the chat screen.
 
       toast.show({
         title: "success",
@@ -179,11 +182,7 @@ export default function Signup({
       });
 
       navigation.navigate("ChatPage");
-
-
-
     } catch (error) {
-
       if (error.response && error.response.data) {
         console.log(error.response.data); // Server-side error message
 
@@ -195,9 +194,6 @@ export default function Signup({
           isClosable: true,
           placement: "bottom",
         });
-
-
-
       } else {
         console.log(error.message); // Generic error, like network issue
 
@@ -211,10 +207,8 @@ export default function Signup({
         });
       }
 
-      setLoading(false)
-
+      setLoading(false);
     }
-
   };
 
   return (
@@ -299,7 +293,11 @@ export default function Signup({
         )}
       </Box>
 
-      <Button style={styles.signUpButton} colorScheme="blue" onPress={submitHandler}>
+      <Button
+        style={styles.signUpButton}
+        colorScheme="blue"
+        onPress={submitHandler}
+      >
         Sign Up
       </Button>
     </VStack>
