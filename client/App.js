@@ -23,8 +23,8 @@ export default function App() {
           initialRouteName="HomePage"
           screenOptions={{ headerShown: false }}
         >
-          <Stack.Screen name="ChatPage" component={ChatPage} />
           <Stack.Screen name="HomePage" component={HomePage} />
+          <Stack.Screen name="ChatPage" component={ChatPage} />
         </Stack.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>
