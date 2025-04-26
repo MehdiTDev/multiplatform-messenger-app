@@ -1,11 +1,4 @@
-import {
-  NativeBaseProvider,
-  Box,
-  HStack,
-  Pressable,
-  Text,
-  useToast,
-} from "native-base";
+import { NativeBaseProvider, Box, HStack, Pressable, Text } from "native-base";
 import { StyleSheet } from "react-native";
 import { useState } from "react";
 import Login from "../components/Login";
@@ -13,22 +6,6 @@ import Signup from "../components/Signup";
 
 export default function HomePage({ navigation }) {
   const [selectedTab, setSelectedTab] = useState("Login");
-  const toast = useToast();
-
-  // Login states
-  const [emailLogIn, setEmailLogIn] = useState("");
-  const [passwordLogIn, setPasswordLogIn] = useState("");
-  const [showPasswordLogIn, setShowPasswordLogIn] = useState(false);
-
-  // Signup states
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPasswordSignUp, setShowPasswordSignUp] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [pic, setPic] = useState(null); // State to store the image URI
-  const [loading, setLoading] = useState(false);
 
   return (
     <NativeBaseProvider>
@@ -61,43 +38,9 @@ export default function HomePage({ navigation }) {
 
           {/* Render forms */}
           {selectedTab === "Login" ? (
-            <Login
-              email={emailLogIn}
-              setEmail={setEmailLogIn}
-              password={passwordLogIn}
-              setPassword={setPasswordLogIn}
-              showPassword={showPasswordLogIn}
-              setShowPassword={setShowPasswordLogIn}
-              onLogin={() => {}}
-              onGuest={() => {
-                navigation.navigate("TestPage");
-              }}
-              isLoading={loading}
-              setLoading={setLoading}
-              navigation={navigation}
-            />
+            <Login navigation={navigation} />
           ) : (
-            <Signup
-              name={name}
-              setName={setName}
-              email={email}
-              setEmail={setEmail}
-              password={password}
-              setPassword={setPassword}
-              confirmPassword={confirmPassword}
-              setConfirmPassword={setConfirmPassword}
-              showPassword={showPasswordSignUp}
-              setShowPassword={setShowPasswordSignUp}
-              showConfirmPassword={showConfirmPassword}
-              setShowConfirmPassword={setShowConfirmPassword}
-              onSignup={() => {}}
-              onPickImage={() => {}}
-              image={pic}
-              setPic={setPic}
-              isLoading={loading}
-              setLoading={setLoading}
-              navigation={navigation}
-            />
+            <Signup navigation={navigation} />
           )}
         </Box>
       </Box>

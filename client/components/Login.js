@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -11,17 +11,12 @@ import {
 import { StyleSheet } from "react-native";
 import axios from "axios";
 
-export default function Login({
-  email,
-  setEmail,
-  password,
-  setPassword,
-  showPassword,
-  setShowPassword,
-  onGuest,
-  setLoading,
-  navigation,
-}) {
+export default function Login({ navigation }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const toast = useToast();
 
   const submitHandler = async () => {
@@ -63,7 +58,6 @@ export default function Login({
       });
 
       localStorage.setItem("userInfo", JSON.stringify(data));
-
       navigation.navigate("ChatPage");
     } catch (error) {
       toast.show({
@@ -115,25 +109,15 @@ export default function Login({
         style={styles.loginButton}
         colorScheme="blue"
         onPress={submitHandler}
+        isLoading={loading}
       >
         Login
-      </Button>
-
-      <Button style={styles.guestButton} colorScheme="red" onPress={onGuest}>
-        Get Guest User Credentials
       </Button>
     </VStack>
   );
 }
 
 const styles = StyleSheet.create({
-  label: {
-    marginBottom: 4,
-  },
-  loginButton: {
-    marginTop: 8,
-  },
-  guestButton: {
-    marginTop: 8,
-  },
+  label: { marginBottom: 4 },
+  loginButton: { marginTop: 8 },
 });

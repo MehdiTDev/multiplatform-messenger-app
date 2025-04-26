@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -12,35 +12,27 @@ import { StyleSheet, Image } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 
-export default function Signup({
-  name,
-  setName,
-  email,
-  setEmail,
-  password,
-  setPassword,
-  confirmPassword,
-  setConfirmPassword,
-  showPassword,
-  setShowPassword,
-  showConfirmPassword,
-  setShowConfirmPassword,
-  image,
-  setPic,
-  setLoading,
-  navigation,
-}) {
+export default function Signup({ navigation }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [pic, setPic] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const toast = useToast();
 
   const postDetails = async (imageUri) => {
     setLoading(true);
     if (!imageUri) {
-      toast({
+      toast.show({
         title: "Please select an image",
         status: "warning",
         duration: 5000,
         isClosable: true,
-        placement: "bottom", // Corrected placement
+        placement: "bottom",
       });
       setLoading(false);
       return;
@@ -50,7 +42,7 @@ export default function Signup({
     try {
       const response = await fetch(imageUri);
       const blob = await response.blob();
-      data.append("file", blob, "upload.jpg"); // Pass blob and filename
+      data.append("file", blob, "upload.jpg");
       data.append("upload_preset", "chat-app");
       data.append("cloud_name", "dpfocfuir");
 
@@ -65,7 +57,6 @@ export default function Signup({
       const result = await cloudinaryResponse.json();
 
       if (result && result.secure_url) {
-        console.log("Cloudinary Upload Success:", result); // Log the entire result on success
         setPic(result.secure_url);
         toast.show({
           title: "Image uploaded!",
@@ -75,7 +66,6 @@ export default function Signup({
           placement: "bottom",
         });
       } else {
-        console.error("Cloudinary Upload Failed:", result); // Log the entire result on failure
         toast.show({
           title: "Upload failed",
           description: result?.error?.message || "Unknown error",
@@ -86,7 +76,6 @@ export default function Signup({
         });
       }
     } catch (error) {
-      console.error("Upload error:", error);
       toast.show({
         title: "Error uploading image",
         status: "error",
@@ -116,41 +105,37 @@ export default function Signup({
 
     if (!result.canceled) {
       const imageUri = result.assets[0].uri;
-      setPic(imageUri); // Update state with image URI
-      await postDetails(imageUri); // Call function to upload to Cloudinary
+      setPic(imageUri);
+      await postDetails(imageUri);
     }
   };
 
   const submitHandler = async () => {
-    // your signUp function here
-
     setLoading(true);
 
     if (!name || !email || !password || !confirmPassword) {
       toast.show({
-        title: "failure",
+        title: "Failure",
         description: "Please fill all the required fields",
-        status: "failed",
+        status: "error",
         duration: 1000,
         isClosable: true,
         placement: "bottom",
       });
-
       setLoading(false);
       return;
     }
 
-    if (password != confirmPassword) {
+    if (password !== confirmPassword) {
       toast.show({
         title: "Error",
         description: "Passwords do not match",
-        status: "failed",
+        status: "error",
         duration: 1000,
         isClosable: true,
         placement: "bottom",
       });
-
-      setLoading(false); // not in the tutorials
+      setLoading(false);
       return;
     }
 
@@ -163,17 +148,14 @@ export default function Signup({
 
       const { data } = await axios.post(
         "http://localhost:5000/api/user",
-        { name, email, password, image },
+        { name, email, password, pic },
         config
       );
 
       localStorage.setItem("userInfo", JSON.stringify(data));
 
-      setLoading(false);
-      // history.push('/chats')  // if registration was successfull redirekt the user to the chat screen.
-
       toast.show({
-        title: "success",
+        title: "Success",
         description: "Registration was successful",
         status: "success",
         duration: 1000,
@@ -183,30 +165,15 @@ export default function Signup({
 
       navigation.navigate("ChatPage");
     } catch (error) {
-      if (error.response && error.response.data) {
-        console.log(error.response.data); // Server-side error message
-
-        toast.show({
-          title: "Error",
-          description: error.response.data.message,
-          status: "failed",
-          duration: 1000,
-          isClosable: true,
-          placement: "bottom",
-        });
-      } else {
-        console.log(error.message); // Generic error, like network issue
-
-        toast.show({
-          title: "Network error",
-          description: error.message,
-          status: "failed",
-          duration: 1000,
-          isClosable: true,
-          placement: "bottom",
-        });
-      }
-
+      toast.show({
+        title: "Error",
+        description: error.response?.data?.message || error.message,
+        status: "error",
+        duration: 1000,
+        isClosable: true,
+        placement: "bottom",
+      });
+    } finally {
       setLoading(false);
     }
   };
@@ -259,7 +226,7 @@ export default function Signup({
           Confirm Password <Text color="red.500">*</Text>
         </Text>
         <Input
-          placeholder="Confirm password"
+          placeholder="Confirm Password"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           type={showConfirmPassword ? "text" : "password"}
@@ -285,10 +252,9 @@ export default function Signup({
           Choose File
         </Button>
 
-        {/* Center the image */}
-        {image && (
+        {pic && (
           <Box style={styles.imageContainer}>
-            <Image source={{ uri: image }} style={styles.image} />
+            <Image source={{ uri: pic }} style={styles.image} />
           </Box>
         )}
       </Box>
@@ -297,6 +263,7 @@ export default function Signup({
         style={styles.signUpButton}
         colorScheme="blue"
         onPress={submitHandler}
+        isLoading={loading}
       >
         Sign Up
       </Button>
@@ -312,7 +279,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
-
   image: {
     width: 100,
     height: 100,
