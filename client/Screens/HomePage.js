@@ -1,11 +1,19 @@
 import { NativeBaseProvider, Box, HStack, Pressable, Text } from "native-base";
 import { StyleSheet } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Login from "../components/Login";
 import Signup from "../components/Signup";
 
 export default function HomePage({ navigation }) {
   const [selectedTab, setSelectedTab] = useState("Login");
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+
+    if (user) {
+      navigation.navigate("ChatPage");
+    }
+  }, []);
 
   return (
     <NativeBaseProvider>

@@ -1,21 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// local storage for React Native
-import { useNavigation } from "@react-navigation/native";
 
 const ChatContext = createContext();
 
 const ChatProvider = ({ children }) => {
   const [user, setUser] = useState();
-  const navigation = useNavigation();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const userInfo = await AsyncStorage.getItem("userInfo");
+    const fetchUser = () => {
+      const userInfo = localStorage.getItem("userInfo");
       if (userInfo) {
         setUser(JSON.parse(userInfo));
-      } else {
-        navigation.navigate("HomePage"); // or "Login" if you have a login page
       }
     };
 
