@@ -14,13 +14,20 @@ import {
 } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
+import { ChatState } from "../Context/ChatProvider";
 
 export default function ChatPage({ navigation }) {
-  const [user, setUser] = useState(null);
-  const [activeChat, setActiveChat] = useState(null);
-  const [searchText, setSearchText] = useState("");
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
+  // const [activeChat, setActiveChat] = useState(null);
+  // const [searchText, setSearchText] = useState("");
+  // const [message, setMessage] = useState("");
+  // const [messages, setMessages] = useState([]);
+
+  const [search, setSearch] = useState("");
+  const [searchResault, setSearchResault] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingChat, setLoadingChat] = useState();
+
+  const { user } = ChatState();
 
   // Sample chat data
   const [chats, setChats] = useState([
