@@ -1,21 +1,17 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Box,
-  Text,
   Button,
   Input,
   Avatar,
   Spinner,
-  IconButton,
   useToast,
-  Drawer,
-  DrawerBody,
-  DrawerHeader,
-  DrawerContent,
-  DrawerOverlay,
   Badge,
   Menu,
   Pressable,
+  Actionsheet,
+  useDisclose,
+  Text,
 } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
@@ -23,14 +19,14 @@ import { useNavigation } from "@react-navigation/native";
 import ProfileModal from "./ProfileModal";
 import UserListItem from "../userAvatar/UserListItem";
 import { ChatState } from "../../Context/ChatProvider";
-import { getSender } from "../../config/ChatLogics";
 
 function SideDrawer() {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+
+  const { isOpen, onOpen, onClose } = useDisclose();
 
   const {
     setSelectedChat,
@@ -62,16 +58,11 @@ function SideDrawer() {
 
     try {
       setLoading(true);
-
       const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
+        headers: { Authorization: `Bearer ${user.token}` },
       };
-
       const { data } = await axios.get(`/api/user?search=${search}`, config);
-
-      setSearchResult(data);
+      setSearchResult(data || []); // Fallback to empty array
     } catch (error) {
       toast.show({
         title: "Error occurred!",
@@ -88,19 +79,18 @@ function SideDrawer() {
   const accessChat = async (userId) => {
     try {
       setLoadingChat(true);
-
       const config = {
         headers: {
           "Content-type": "application/json",
           Authorization: `Bearer ${user.token}`,
         },
       };
-
       const { data } = await axios.post(`/api/chat`, { userId }, config);
-
-      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+      if (!chats.find((c) => c._id === data._id)) {
+        setChats([data, ...chats]);
+      }
       setSelectedChat(data);
-      setIsOpen(false);
+      onClose();
     } catch (error) {
       toast.show({
         title: "Error fetching the chat",
@@ -122,16 +112,14 @@ function SideDrawer() {
         alignItems="center"
         bg="white"
         p={3}
-        borderWidth={2}
+        borderWidth={1} // Changed from 2 to 1 for better scaling
       >
         <Button
           variant="ghost"
-          onPress={() => setIsOpen(true)}
+          onPress={onOpen}
           leftIcon={<Ionicons name="search" size={24} color="black" />}
         >
-          <Text display={{ base: "none", md: "flex" }} px={4}>
-            Search User
-          </Text>
+          <Text px={4}>Search User</Text>
         </Button>
 
         <Text fontSize="2xl" fontFamily="Work sans">
@@ -139,42 +127,37 @@ function SideDrawer() {
         </Text>
 
         <Menu
-          trigger={(triggerProps) => {
-            return (
-              <Pressable {...triggerProps}>
-                <Box position="relative">
-                  <Ionicons name="notifications" size={28} />
-                  {notification.length > 0 && (
-                    <Badge
-                      colorScheme="danger"
-                      rounded="full"
-                      position="absolute"
-                      top={-1}
-                      right={-2}
-                      zIndex={1}
-                      variant="solid"
-                      _text={{ fontSize: 10 }}
-                    >
-                      {notification.length}
-                    </Badge>
-                  )}
-                </Box>
-              </Pressable>
-            );
-          }}
+          trigger={(triggerProps) => (
+            <Pressable {...triggerProps}>
+              <Box position="relative">
+                <Ionicons name="notifications" size={28} />
+                {notification?.length > 0 && (
+                  <Badge
+                    colorScheme="danger"
+                    rounded="full"
+                    position="absolute"
+                    top={-1}
+                    right={-2}
+                    zIndex={1}
+                    variant="solid"
+                    _text={{ fontSize: 10 }}
+                  >
+                    {notification.length}
+                  </Badge>
+                )}
+              </Box>
+            </Pressable>
+          )}
         >
-          {/* You can map over notifications here */}
           <Menu.Item>No new notifications</Menu.Item>
         </Menu>
 
         <Menu
-          trigger={(triggerProps) => {
-            return (
-              <Pressable {...triggerProps}>
-                <Avatar size="sm" source={{ uri: user.pic }} />
-              </Pressable>
-            );
-          }}
+          trigger={(triggerProps) => (
+            <Pressable {...triggerProps}>
+              <Avatar size="sm" source={{ uri: user.pic }} />
+            </Pressable>
+          )}
         >
           <Menu.Item onPress={() => navigation.navigate("Profile")}>
             <ProfileModal user={user} />
@@ -183,38 +166,37 @@ function SideDrawer() {
         </Menu>
       </Box>
 
-      <Drawer isOpen={isOpen} onClose={() => setIsOpen(false)} placement="left">
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerHeader>Search Users</DrawerHeader>
-          <DrawerBody>
-            <Box flexDirection="row" pb={2}>
-              <Input
-                placeholder="Search by name or email"
-                mr={2}
-                flex={1}
-                value={search}
-                onChangeText={(value) => setSearch(value)}
+      <Actionsheet isOpen={isOpen} onClose={onClose} disableOverlay={false}>
+        <Actionsheet.Content>
+          <Text fontSize="md" fontWeight="bold" mb={3}>
+            Search Users
+          </Text>
+          <Box flexDirection="row" px={3} pb={2} width="100%">
+            <Input
+              flex={1}
+              placeholder="Search by name or email"
+              mr={2}
+              value={search}
+              onChangeText={(text) => setSearch(text)}
+            />
+            <Button onPress={handleSearch}>Go</Button>
+          </Box>
+
+          {loading ? (
+            <Spinner />
+          ) : (
+            searchResult?.map((u) => (
+              <UserListItem
+                key={u._id}
+                user={u}
+                handleFunction={() => accessChat(u._id)}
               />
-              <Button onPress={handleSearch}>Go</Button>
-            </Box>
+            ))
+          )}
 
-            {loading ? (
-              <Spinner />
-            ) : (
-              searchResult?.map((u) => (
-                <UserListItem
-                  key={u._id}
-                  user={u}
-                  handleFunction={() => accessChat(u._id)}
-                />
-              ))
-            )}
-
-            {loadingChat && <Spinner size="lg" />}
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
+          {loadingChat && <Spinner size="lg" />}
+        </Actionsheet.Content>
+      </Actionsheet>
     </>
   );
 }

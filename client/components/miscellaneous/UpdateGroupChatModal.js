@@ -1,4 +1,4 @@
-import { ViewIcon } from "native";
+import { ViewIcon } from "native-base";
 import {
   Modal,
   ModalOverlay,
@@ -15,7 +15,7 @@ import {
   Box,
   IconButton,
   Spinner,
-} from "native";
+} from "native-base";
 import axios from "axios";
 import { useState } from "react";
 import { ChatState } from "../../Context/ChatProvider";
