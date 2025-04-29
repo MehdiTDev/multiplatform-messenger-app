@@ -4,8 +4,6 @@ import {
   Text,
   Button,
   Input,
-  Menu,
-  MenuItem,
   Avatar,
   Spinner,
   IconButton,
@@ -15,10 +13,11 @@ import {
   DrawerHeader,
   DrawerContent,
   DrawerOverlay,
+  Badge,
+  Menu,
+  Pressable,
 } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
-import NotificationBadge from "react-notification-badge";
-import { Effect } from "react-notification-badge";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import ProfileModal from "./ProfileModal";
@@ -31,6 +30,7 @@ function SideDrawer() {
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const {
     setSelectedChat,
@@ -42,7 +42,6 @@ function SideDrawer() {
   } = ChatState();
 
   const toast = useToast();
-  const [isOpen, setIsOpen] = useState(false);
   const navigation = useNavigation();
 
   const logoutHandler = () => {
@@ -53,7 +52,7 @@ function SideDrawer() {
   const handleSearch = async () => {
     if (!search) {
       toast.show({
-        title: "Please Enter something in search",
+        title: "Please enter something in search",
         status: "warning",
         duration: 5000,
         placement: "top",
@@ -72,35 +71,35 @@ function SideDrawer() {
 
       const { data } = await axios.get(`/api/user?search=${search}`, config);
 
-      setLoading(false);
       setSearchResult(data);
     } catch (error) {
       toast.show({
-        title: "Error Occured!",
-        description: "Failed to Load the Search Results",
+        title: "Error occurred!",
+        description: "Failed to load search results",
         status: "error",
         duration: 5000,
         placement: "bottom",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const accessChat = async (userId) => {
-    console.log(userId);
-
     try {
       setLoadingChat(true);
+
       const config = {
         headers: {
           "Content-type": "application/json",
           Authorization: `Bearer ${user.token}`,
         },
       };
+
       const { data } = await axios.post(`/api/chat`, { userId }, config);
 
       if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
       setSelectedChat(data);
-      setLoadingChat(false);
       setIsOpen(false);
     } catch (error) {
       toast.show({
@@ -110,6 +109,8 @@ function SideDrawer() {
         duration: 5000,
         placement: "bottom",
       });
+    } finally {
+      setLoadingChat(false);
     }
   };
 
@@ -137,28 +138,52 @@ function SideDrawer() {
           Talk-A-Tive
         </Text>
 
-        <Menu>
-          <Menu.Item>
-            <NotificationBadge
-              count={notification.length}
-              effect={Effect.SCALE}
-            />
-            <IconButton
-              icon={<Ionicons name="notifications" size={24} color="black" />}
-              onPress={() => {}}
-            />
+        <Menu
+          trigger={(triggerProps) => {
+            return (
+              <Pressable {...triggerProps}>
+                <Box position="relative">
+                  <Ionicons name="notifications" size={28} />
+                  {notification.length > 0 && (
+                    <Badge
+                      colorScheme="danger"
+                      rounded="full"
+                      position="absolute"
+                      top={-1}
+                      right={-2}
+                      zIndex={1}
+                      variant="solid"
+                      _text={{ fontSize: 10 }}
+                    >
+                      {notification.length}
+                    </Badge>
+                  )}
+                </Box>
+              </Pressable>
+            );
+          }}
+        >
+          {/* You can map over notifications here */}
+          <Menu.Item>No new notifications</Menu.Item>
+        </Menu>
+
+        <Menu
+          trigger={(triggerProps) => {
+            return (
+              <Pressable {...triggerProps}>
+                <Avatar size="sm" source={{ uri: user.pic }} />
+              </Pressable>
+            );
+          }}
+        >
+          <Menu.Item onPress={() => navigation.navigate("Profile")}>
+            <ProfileModal user={user} />
           </Menu.Item>
-          <Menu.Item>
-            <Avatar size="sm" source={{ uri: user.pic }} />
-            <Menu.Item onPress={logoutHandler}>Logout</Menu.Item>
-            <Menu.Item>
-              <ProfileModal user={user} />
-            </Menu.Item>
-          </Menu.Item>
+          <Menu.Item onPress={logoutHandler}>Logout</Menu.Item>
         </Menu>
       </Box>
 
-      <Drawer isOpen={isOpen} onClose={() => setIsOpen(false)}>
+      <Drawer isOpen={isOpen} onClose={() => setIsOpen(false)} placement="left">
         <DrawerOverlay />
         <DrawerContent>
           <DrawerHeader>Search Users</DrawerHeader>
@@ -167,22 +192,25 @@ function SideDrawer() {
               <Input
                 placeholder="Search by name or email"
                 mr={2}
+                flex={1}
                 value={search}
                 onChangeText={(value) => setSearch(value)}
               />
               <Button onPress={handleSearch}>Go</Button>
             </Box>
+
             {loading ? (
               <Spinner />
             ) : (
-              searchResult?.map((user) => (
+              searchResult?.map((u) => (
                 <UserListItem
-                  key={user._id}
-                  user={user}
-                  handleFunction={() => accessChat(user._id)}
+                  key={u._id}
+                  user={u}
+                  handleFunction={() => accessChat(u._id)}
                 />
               ))
             )}
+
             {loadingChat && <Spinner size="lg" />}
           </DrawerBody>
         </DrawerContent>
