@@ -1,6 +1,5 @@
-import React from "react";
-import { Avatar, Tooltip, Text, Box, HStack } from "native-base";
-import ScrollableFeed from "react-native-scrollable-feed"; // You might need to install this package
+import React, { useRef, useEffect } from "react";
+import { Avatar, Tooltip, Text, Box, HStack, ScrollView } from "native-base";
 import {
   isLastMessage,
   isSameSender,
@@ -11,9 +10,21 @@ import { ChatState } from "../Context/ChatProvider";
 
 const ScrollableChat = ({ messages }) => {
   const { user } = ChatState();
+  const scrollViewRef = useRef();
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  }, [messages]);
 
   return (
-    <ScrollableFeed>
+    <ScrollView
+      ref={scrollViewRef}
+      contentContainerStyle={{ paddingBottom: 20 }}
+      showsVerticalScrollIndicator={false}
+    >
       {messages &&
         messages.map((m, i) => (
           <HStack key={m._id} space={2} alignItems="flex-start">
@@ -43,7 +54,7 @@ const ScrollableChat = ({ messages }) => {
             </Box>
           </HStack>
         ))}
-    </ScrollableFeed>
+    </ScrollView>
   );
 };
 
