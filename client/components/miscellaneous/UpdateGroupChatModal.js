@@ -1,4 +1,4 @@
-import { ViewIcon } from "@chakra-ui/icons";
+import { ViewIcon } from "native";
 import {
   Modal,
   ModalOverlay,
@@ -15,7 +15,7 @@ import {
   Box,
   IconButton,
   Spinner,
-} from "@chakra-ui/react";
+} from "native";
 import axios from "axios";
 import { useState } from "react";
 import { ChatState } from "../../Context/ChatProvider";
