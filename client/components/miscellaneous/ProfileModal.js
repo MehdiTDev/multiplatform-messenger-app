@@ -7,6 +7,9 @@ import {
   Image,
   View,
   useDisclose,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
 } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -25,44 +28,44 @@ export default function ProfileModal({ user, children }) {
       )}
 
       {/* <Modal
-          isOpen={isOpen}
-          onClose={onClose}
-          size="lg"
-          style={{ justifyContent: "center", alignItems: "center" }}
-        >
-          <Modal.Content style={{ width: "90%", maxHeight: 410, padding: 20 }}>
-            <Modal.Header
-              style={{ justifyContent: "center", alignItems: "center" }}
+        isOpen={isOpen}
+        onClose={onClose}
+        size="lg"
+        style={{ justifyContent: "center", alignItems: "center" }}
+      >
+        <ModalContent style={{ width: "90%", maxHeight: 410, padding: 20 }}>
+          <ModalHeader
+            style={{ justifyContent: "center", alignItems: "center" }}
+          >
+            <Text style={{ fontSize: 40, fontFamily: "Work Sans" }}>
+              {user.name}
+            </Text>
+          </ModalHeader>
+          <ModalBody
+            style={{
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              style={{ borderRadius: 75, width: 150, height: 150 }}
+              source={user.pic}
+              alt={user.name}
+            />
+            <Text
+              style={{ fontSize: 28, fontFamily: "Work Sans", marginTop: 20 }}
             >
-              <Text style={{ fontSize: 40, fontFamily: "Work Sans" }}>
-                {user.name}
-              </Text>
-            </Modal.Header>
-            <Modal.Body
-              style={{
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Image
-                style={{ borderRadius: 75, width: 150, height: 150 }}
-                source={{ uri: user.pic }}
-                alt={user.name}
-              />
-              <Text
-                style={{ fontSize: 28, fontFamily: "Work Sans", marginTop: 20 }}
-              >
-                Email: {user.email}
-              </Text>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button onPress={onClose}>
-                <Text>Close</Text>
-              </Button>
-            </Modal.Footer>
-          </Modal.Content>
-        </Modal> */}
+              Email: {user.email}
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button onPress={onClose}>
+              <Text>Close</Text>
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal> */}
     </>
   );
 }
