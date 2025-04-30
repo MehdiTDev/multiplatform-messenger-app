@@ -4,7 +4,7 @@ import { Box, Text } from "native-base";
 const ChatBox = () => {
   return (
     <Box>
-      <Text fontSize="md">ChatBox</Text>
+      <Text>ChatBox</Text>
     </Box>
   );
 };
