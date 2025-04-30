@@ -68,11 +68,7 @@ export default function SideDrawer() {
             trigger={(triggerProps) => (
               <Pressable {...triggerProps}>
                 <HStack alignItems="center">
-                  <Avatar
-                    size="sm"
-                    bg="gray.300"
-                    source={{ uri: "https://via.placeholder.com/150" }}
-                  />
+                  <Avatar size="sm" name={user.name} source={user.pic} />
                   <Icon
                     as={MaterialIcons}
                     name="keyboard-arrow-down"
