@@ -1,8 +1,8 @@
 import { NativeBaseProvider, Box, HStack, Pressable, Text } from "native-base";
 import { StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
-import Login from "../components/Login";
-import Signup from "../components/Signup";
+import Login from "../components/Authentication/Login";
+import Signup from "../components/Authentication/Signup";
 
 export default function HomePage({ navigation }) {
   const [selectedTab, setSelectedTab] = useState("Login");
