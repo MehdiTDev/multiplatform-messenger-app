@@ -19,6 +19,7 @@ import {
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
 import { ChatState } from "../../Context/ChatProvider";
+import ProfileModal from "./ProfileModal";
 
 export default function SideDrawer() {
   const [search, setSearch] = useState("");
@@ -78,7 +79,9 @@ export default function SideDrawer() {
               </Pressable>
             )}
           >
-            <Menu.Item>My Profile</Menu.Item>
+            <ProfileModal>
+              <Menu.Item>My Profile</Menu.Item>
+            </ProfileModal>
             <Divider />
             <Menu.Item>Logout</Menu.Item>
           </Menu>
