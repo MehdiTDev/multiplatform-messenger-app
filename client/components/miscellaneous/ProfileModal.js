@@ -1,71 +1,33 @@
 import React from "react";
-import {
-  Modal,
-  Button,
-  Text,
-  IconButton,
-  Image,
-  View,
-  useDisclose,
-  ModalBody,
-  ModalContent,
-  ModalHeader,
-} from "native-base";
-import { Ionicons } from "@expo/vector-icons";
+import { Modal, Button, Text, Image, Pressable } from "native-base";
+import { useDisclose } from "native-base";
 
 export default function ProfileModal({ user, children }) {
   const { isOpen, onOpen, onClose } = useDisclose();
 
   return (
     <>
-      {children ? (
-        <Text onPress={onOpen}>{children}</Text>
-      ) : (
-        <IconButton
-          icon={<Ionicons name="eye" size={24} color="black" />}
-          onPress={onOpen}
-        />
-      )}
+      <Pressable onPress={onOpen}>{children}</Pressable>
 
-      {/* <Modal
-        isOpen={isOpen}
-        onClose={onClose}
-        size="lg"
-        style={{ justifyContent: "center", alignItems: "center" }}
-      >
-        <ModalContent style={{ width: "90%", maxHeight: 410, padding: 20 }}>
-          <ModalHeader
-            style={{ justifyContent: "center", alignItems: "center" }}
-          >
-            <Text style={{ fontSize: 40, fontFamily: "Work Sans" }}>
-              {user.name}
-            </Text>
-          </ModalHeader>
-          <ModalBody
-            style={{
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
+      <Modal isOpen={isOpen} onClose={onClose} size="lg">
+        <Modal.Content maxWidth="400px">
+          <Modal.CloseButton />
+          <Modal.Header>{user.name}</Modal.Header>
+          <Modal.Body style={{ alignItems: "center" }}>
             <Image
-              style={{ borderRadius: 75, width: 150, height: 150 }}
               source={user.pic}
               alt={user.name}
+              style={{ borderRadius: 75, width: 150, height: 150 }}
             />
-            <Text
-              style={{ fontSize: 28, fontFamily: "Work Sans", marginTop: 20 }}
-            >
+            <Text style={{ fontSize: 18, marginTop: 10 }}>
               Email: {user.email}
             </Text>
-          </ModalBody>
-          <ModalFooter>
-            <Button onPress={onClose}>
-              <Text>Close</Text>
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal> */}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onPress={onClose}>Close</Button>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
     </>
   );
 }
