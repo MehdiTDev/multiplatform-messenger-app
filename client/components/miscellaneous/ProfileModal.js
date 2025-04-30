@@ -10,16 +10,27 @@ export default function ProfileModal({ user, children }) {
       <Pressable onPress={onOpen}>{children}</Pressable>
 
       <Modal isOpen={isOpen} onClose={onClose} size="lg">
-        <Modal.Content maxWidth="400px">
+        <Modal.Content maxWidth="400px" maxHeight="500px">
+          {" "}
+          {/* adjust height as needed */}
           <Modal.CloseButton />
-          <Modal.Header>{user.name}</Modal.Header>
-          <Modal.Body style={{ alignItems: "center" }}>
+          <Modal.Header>
+            <Text
+              fontSize="40px"
+              fontFamily="Work Sans"
+              textAlign="center"
+              width="100%"
+            >
+              {user.name}
+            </Text>
+          </Modal.Header>
+          <Modal.Body alignItems="center">
             <Image
               source={user.pic}
               alt={user.name}
               style={{ borderRadius: 75, width: 150, height: 150 }}
             />
-            <Text style={{ fontSize: 18, marginTop: 10 }}>
+            <Text fontSize="18px" mt={4}>
               Email: {user.email}
             </Text>
           </Modal.Body>
