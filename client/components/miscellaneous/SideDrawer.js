@@ -79,7 +79,7 @@ export default function SideDrawer() {
               </Pressable>
             )}
           >
-            <ProfileModal>
+            <ProfileModal user={user}>
               <Menu.Item>My Profile</Menu.Item>
             </ProfileModal>
             <Divider />
