@@ -18,10 +18,16 @@ import {
 } from "native-base";
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
+import { ChatState } from "../../Context/ChatProvider";
 
 export default function SideDrawer() {
   const [search, setSearch] = useState("");
+  const [searchResult, setSearchResult] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingChat, setLoadingChat] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclose();
+
+  const { user } = ChatState();
 
   return (
     <>
