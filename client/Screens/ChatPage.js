@@ -14,29 +14,33 @@ import {
   ScrollView,
 } from "native-base";
 import { ChatState } from "../Context/ChatProvider";
+import { StyleSheet } from "react-native";
+import SideDrawer from "../components/miscellaneous/SideDrawer";
+import MyChats from "../components/MyChats";
+import ChatBox from "../components/ChatBox";
 
 export default function ChatPage({ navigation }) {
   const { user } = ChatState();
 
-  useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    if (!userInfo) {
-      navigation.navigate("HomePage");
-    } else {
-      setUser(userInfo);
-      setActiveChat(chats[0]);
-      if (chats[0]) {
-        setMessages(chatMessages[chats[0].id] || []);
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  //   if (!userInfo) {
+  //     navigation.navigate("HomePage");
+  //   } else {
+  //     setUser(userInfo);
+  //     setActiveChat(chats[0]);
+  //     if (chats[0]) {
+  //       setMessages(chatMessages[chats[0].id] || []);
+  //     }
+  //   }
+  // }, []);
 
   return (
     <HStack flex={1} bg="white" safeArea>
-      {/* {user && <SideDrawer/>}  */}
+      {user && <SideDrawer />}
       <Box>
-        {/* {user && <MyChats/>}  */}
-        {/* {user && <ChatBox />}  */}
+        {user && <MyChats />}
+        {user && <ChatBox />}
       </Box>
     </HStack>
   );
