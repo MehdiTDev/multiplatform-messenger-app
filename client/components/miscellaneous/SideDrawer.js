@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { StyleSheet } from "react-native";
 import {
   Box,
   Text,
@@ -13,7 +14,6 @@ import {
   HStack,
   VStack,
   Pressable,
-  Modal,
   Drawer,
   Badge,
 } from "native-base";
@@ -25,53 +25,32 @@ export default function SideDrawer() {
   return (
     <>
       {/* Header Bar */}
-      <Box
-        flexDirection="row"
-        justifyContent="space-between"
-        alignItems="center"
-        bg="white"
-        width="100%"
-        padding="5px 10px"
-        borderWidth={1}
-      >
+      <Box style={styles.headerBar}>
         {/* Search Button */}
         <Tooltip label="Search Users to chat" hasArrow placement="bottom-end">
-          <Button variant="ghost">
-            <HStack alignItems="center">
-              <Icon as={FontAwesome} name="search" size={4} />
-              <Text display={{ base: "none", md: "flex" }} px={2}>
-                Search User
-              </Text>
+          <Button variant="ghost" style={styles.ghostButton}>
+            <HStack style={styles.searchStack}>
+              <Icon as={FontAwesome} name="search" style={styles.searchIcon} />
+              <Text style={styles.searchText}>Search User</Text>
             </HStack>
           </Button>
         </Tooltip>
 
         {/* App Title */}
-        <Text fontSize="2xl" fontFamily="Work sans">
-          Multi Chat
-        </Text>
+        <Text style={styles.appTitle}>Talk-A-Tive</Text>
 
         {/* Notification and Profile */}
-        <HStack space={2} alignItems="center">
+        <HStack style={styles.rightIconsStack}>
           {/* Notification */}
           <Menu
             trigger={(triggerProps) => (
               <Pressable {...triggerProps}>
-                <Box>
-                  <Badge
-                    colorScheme="danger"
-                    rounded="full"
-                    mb={-4}
-                    mr={-2}
-                    zIndex={1}
-                  >
-                    3{/* Notification count */}
-                  </Badge>
+                <Box style={styles.notificationBox}>
+                  <Badge style={styles.notificationBadge}>3</Badge>
                   <Icon
                     as={MaterialIcons}
                     name="notifications"
-                    size={6}
-                    m={1}
+                    style={styles.notificationIcon}
                   />
                 </Box>
               </Pressable>
@@ -86,14 +65,19 @@ export default function SideDrawer() {
           <Menu
             trigger={(triggerProps) => (
               <Pressable {...triggerProps}>
-                <HStack alignItems="center">
+                <HStack style={styles.profileStack}>
                   <Avatar
                     size="sm"
                     source={{ uri: "https://example.com/profile.jpg" }}
+                    style={styles.avatar}
                   >
                     User
                   </Avatar>
-                  <Icon as={MaterialIcons} name="arrow-drop-down" size={5} />
+                  <Icon
+                    as={MaterialIcons}
+                    name="arrow-drop-down"
+                    style={styles.dropdownIcon}
+                  />
                 </HStack>
               </Pressable>
             )}
@@ -107,28 +91,125 @@ export default function SideDrawer() {
 
       {/* Search Drawer */}
       <Drawer isOpen={false} onClose={() => {}}>
-        <Drawer.Content>
-          <Drawer.Header borderBottomWidth={1}>Search Users</Drawer.Header>
-          <Drawer.Body>
-            <HStack space={2} pb={2}>
-              <Input flex={1} placeholder="Search by name or email" />
-              <Button>Go</Button>
+        <Drawer.Content style={styles.drawerContent}>
+          <Drawer.Header style={styles.drawerHeader}>
+            Search Users
+          </Drawer.Header>
+          <Drawer.Body style={styles.drawerBody}>
+            <HStack style={styles.searchInputStack}>
+              <Input
+                flex={1}
+                placeholder="Search by name or email"
+                style={styles.searchInput}
+              />
+              <Button style={styles.searchButton}>Go</Button>
             </HStack>
 
             {/* User List Placeholder */}
-            <VStack space={2}>
-              <Box p={2} bg="gray.100" rounded="md">
-                User 1
-              </Box>
-              <Box p={2} bg="gray.100" rounded="md">
-                User 2
-              </Box>
+            <VStack style={styles.userList}>
+              <Box style={styles.userItem}>User 1</Box>
+              <Box style={styles.userItem}>User 2</Box>
             </VStack>
 
-            <Spinner mt={2} alignSelf="center" />
+            <Spinner style={styles.spinner} />
           </Drawer.Body>
         </Drawer.Content>
       </Drawer>
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  // Header Styles
+  headerBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "white",
+    width: "100%",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+  },
+  ghostButton: {
+    backgroundColor: "transparent",
+  },
+  searchStack: {
+    alignItems: "center",
+  },
+  searchIcon: {
+    fontSize: 16,
+  },
+  searchText: {
+    display: "none", // Will be overridden for medium+ screens
+  },
+  appTitle: {
+    fontSize: 24,
+    fontFamily: "Work sans",
+  },
+  rightIconsStack: {
+    alignItems: "center",
+    gap: 8,
+  },
+
+  // Notification Styles
+  notificationBox: {
+    position: "relative",
+  },
+  notificationBadge: {
+    position: "absolute",
+    backgroundColor: "red",
+    borderRadius: 999,
+    top: -8,
+    right: -4,
+    zIndex: 1,
+  },
+  notificationIcon: {
+    fontSize: 24,
+    margin: 4,
+  },
+
+  // Profile Styles
+  profileStack: {
+    alignItems: "center",
+  },
+  avatar: {
+    cursor: "pointer",
+  },
+  dropdownIcon: {
+    fontSize: 20,
+  },
+
+  // Drawer Styles
+  drawerContent: {
+    width: "80%",
+  },
+  drawerHeader: {
+    borderBottomWidth: 1,
+  },
+  drawerBody: {
+    padding: 8,
+  },
+  searchInputStack: {
+    paddingBottom: 8,
+    gap: 8,
+  },
+  searchInput: {
+    flex: 1,
+  },
+  searchButton: {
+    // Button styles if needed
+  },
+  userList: {
+    gap: 8,
+  },
+  userItem: {
+    padding: 8,
+    backgroundColor: "#f1f1f1",
+    borderRadius: 4,
+  },
+  spinner: {
+    marginTop: 8,
+    alignSelf: "center",
+  },
+});
