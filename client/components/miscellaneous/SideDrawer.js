@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Text, Tooltip, Icon } from "native-base";
+import { Box, Text, Tooltip, Icon, HStack } from "native-base";
 import { Pressable } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 
@@ -13,7 +13,18 @@ const SideDrawer = () => {
     <Box>
       <Tooltip label="Search Users to chat" hasArrow placement="bottom-end">
         <Pressable>
-          <Icon as={FontAwesome} name="search" size={5} color="black" />
+          <HStack alignItems="center">
+            <Icon as={FontAwesome} name="search" size={5} color="black" />
+            <Text
+              display={{
+                base: "none",
+                md: "flex",
+              }}
+              px={4}
+            >
+              Search User
+            </Text>
+          </HStack>
         </Pressable>
       </Tooltip>
     </Box>

@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     justifyContent: "space-between",
-    padding: 8, // equivalent to p={2} in NativeBase
+    padding: 10, // equivalent to p={2} in NativeBase
   },
   myChats: {
     width: "30%",
