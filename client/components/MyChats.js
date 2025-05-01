@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Box, Text, useToast, Button, Stack, Icon, AddIcon } from "native-base";
+import { Box, Text, useToast, Button, Stack, Icon, PresenceTransition, TouchableOpacity } from "native-base";
 import { ChatState } from "../Context/ChatProvider";
 import ChatLoading from "./ChatLoading";
 import { getSender } from "../config/ChatLogics";
+import GroupChatModal from "./miscellaneous/GroupChatModal";
 import axios from "axios";
+import { Pressable } from "react-native";
 
 
 
@@ -66,14 +68,23 @@ export default function MyChats() {
         alignItems="center"
       >
         <Text>My Chats</Text>
-        <Button
-          d="flex"
-          fontSize={{ base: "17px", md: "10px", lg: "17px" }}
-          rightIcon={<Icon as={AddIcon} />}
-          onPress={() => console.log("New Group Chat clicked")}
-        >
-          New Group Chat
-        </Button>
+        <GroupChatModal>
+          <Text
+            style={{
+              paddingVertical: 8,
+              paddingHorizontal: 16,
+              backgroundColor: "#9B4DCA", // Purple color equivalent
+              borderRadius: 8,
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
+          >
+            New Group Chat
+
+          </Text>
+
+        </GroupChatModal>
       </Box>
 
       <Box
