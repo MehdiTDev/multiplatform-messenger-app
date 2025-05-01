@@ -1,28 +1,43 @@
-import React, { useState } from "react";
+import React from "react";
+import { StyleSheet } from "react-native";
 import { Box, VStack, HStack } from "native-base";
-import Chatbox from "../components/Chatbox";
-import MyChats from "../components/MyChats";
-import SideDrawer from "../components/miscellaneous/SideDrawer";
 import { ChatState } from "../Context/ChatProvider";
-import { ScrollView } from "react-native";
+import SideDrawer from "../components/miscellaneous/SideDrawer";
+import MyChats from "../components/MyChats";
+import ChatBox from "../components/ChatBox";
 
-const Chatpage = () => {
-  const [fetchAgain, setFetchAgain] = useState(false);
+export default function ChatPage({ navigation }) {
   const { user } = ChatState();
 
   return (
-    <Box flex={1} bg="white">
+    <VStack style={styles.mainContainer}>
+      {/* SideDrawer at the top */}
       {user && <SideDrawer />}
 
-      {/* You can use HStack here if you're on tablet/web, otherwise VStack is best for mobile */}
-      <HStack space={2} justifyContent="space-between" w="100%" h="91.5%" p={2}>
-        {user && <MyChats fetchAgain={fetchAgain} />}
-        {user && (
-          <Chatbox fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
-        )}
+      {/* Horizontal chat area with space-between */}
+      <HStack style={styles.chatContainer}>
+        {user && <MyChats style={styles.myChats} />}
+        {user && <ChatBox style={styles.chatBox} />}
       </HStack>
-    </Box>
+    </VStack>
   );
-};
+}
 
-export default Chatpage;
+const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: "#00BFFF",
+  },
+  chatContainer: {
+    flex: 1,
+    width: "100%",
+    justifyContent: "space-between",
+    padding: 10, // equivalent to p={2} in NativeBase
+  },
+  myChats: {
+    width: "30%",
+  },
+  chatBox: {
+    width: "68%",
+  },
+});
