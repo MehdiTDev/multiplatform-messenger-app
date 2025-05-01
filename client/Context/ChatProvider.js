@@ -4,7 +4,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const ChatContext = createContext();
 
 const ChatProvider = ({ children }) => {
+  const [selectedChat, setSelectedChat] = useState();
   const [user, setUser] = useState();
+  const [chats, setChats] = useState();
+
 
   useEffect(() => {
     const fetchUser = () => {
@@ -18,7 +21,7 @@ const ChatProvider = ({ children }) => {
   }, []);
 
   return (
-    <ChatContext.Provider value={{ user, setUser }}>
+    <ChatContext.Provider value={{ user, setUser, selectedChat, setSelectedChat, chats, setChats }}>
       {children}
     </ChatContext.Provider>
   );
