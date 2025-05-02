@@ -10,6 +10,7 @@ export default function ChatPage({ navigation }) {
   const { user } = ChatState();
 
   return (
+
     <VStack style={styles.mainContainer}>
       {/* SideDrawer at the top */}
       {user && <SideDrawer />}
