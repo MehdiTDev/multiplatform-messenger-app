@@ -77,7 +77,7 @@ export default function MyChats() {
             style={{
               paddingVertical: 8,
               paddingHorizontal: 16,
-              backgroundColor: "#9B4DCA", // Purple color equivalent
+              backgroundColor: "#ADD8E6", // Purple color equivalent
               borderRadius: 8,
               alignItems: "center",
               flexDirection: "row",
