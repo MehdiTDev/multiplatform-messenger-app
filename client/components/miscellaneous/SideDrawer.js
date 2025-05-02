@@ -223,7 +223,7 @@ export default function SideDrawer() {
           >
             <Menu.Item>
               <ProfileModal user={user}>
-                <Text>My Profile</Text>
+                <Text>My Profile33</Text>
               </ProfileModal>
             </Menu.Item>
 
