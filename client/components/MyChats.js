@@ -12,6 +12,9 @@ export default function MyChats() {
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const toast = useToast();
 
+  // Track the hover state of the "New Group Chat" button
+  const [hovered, setHovered] = useState(false);
+
   const fetchChats = async () => {
     try {
       const config = {
@@ -65,7 +68,14 @@ export default function MyChats() {
       >
         <Text>My Chats</Text>
         <GroupChatModal>
-          <Text style={styles.newGroupChatBtn}>New Group Chat</Text>
+          <Pressable
+            onMouseEnter={() => setHovered(true)} // Mouse enter sets hovered to true
+            onMouseLeave={() => setHovered(false)} // Mouse leave sets hovered to false
+          >
+            <Text style={[styles.newGroupChatBtn, hovered && styles.hovered]}>
+              New Group Chat
+            </Text>
+          </Pressable>
         </GroupChatModal>
       </Box>
 
@@ -133,6 +143,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "center",
+    transition: "background-color 0.3s ease", // Smooth transition effect
+  },
+  hovered: {
+    backgroundColor: "#4682B4", // Change the color when hovered
   },
   chatItem: {
     paddingHorizontal: 12,
