@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Box, Text, useToast, Stack } from "native-base";
+import { StyleSheet, Pressable } from "react-native";
 import { ChatState } from "../Context/ChatProvider";
 import ChatLoading from "./ChatLoading";
 import { getSender } from "../config/ChatLogics";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import axios from "axios";
-import { Pressable } from "react-native";
 
 export default function MyChats() {
   const [loggedUser, setLoggedUser] = useState();
@@ -65,20 +65,7 @@ export default function MyChats() {
       >
         <Text>My Chats</Text>
         <GroupChatModal>
-          <Text
-            style={{
-              paddingVertical: 8,
-              paddingHorizontal: 16,
-              backgroundColor: "#00BFFF",
-              borderRadius: 8,
-              alignItems: "center",
-              flexDirection: "row",
-              justifyContent: "center",
-              // color: "white",
-            }}
-          >
-            New Group Chat
-          </Text>
+          <Text style={styles.newGroupChatBtn}>New Group Chat</Text>
         </GroupChatModal>
       </Box>
 
@@ -88,21 +75,23 @@ export default function MyChats() {
         p={3}
         bg="#F8F8F8"
         w="100%"
-        h="calc(100vh - 150px)" // fixed height so scroll can happen
+        h="calc(100vh - 150px)"
         borderRadius="lg"
         overflowY="auto"
       >
         {chats ? (
           <Box flex={1} overflowY="auto">
-            {" "}
             <Stack space={3}>
               {chats.map((chat) => (
                 <Pressable key={chat._id} onPress={() => setSelectedChat(chat)}>
                   <Box
-                    bg={selectedChat === chat ? "#38B2AC" : "#E8E8E8"}
-                    px={3}
-                    py={2}
-                    borderRadius="lg"
+                    style={[
+                      styles.chatItem,
+                      {
+                        backgroundColor:
+                          selectedChat === chat ? "#38B2AC" : "#87CEFA",
+                      },
+                    ]}
                   >
                     <Text color={selectedChat === chat ? "white" : "black"}>
                       {!chat.isGroupChat
@@ -134,3 +123,20 @@ export default function MyChats() {
     </Box>
   );
 }
+
+const styles = StyleSheet.create({
+  newGroupChatBtn: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: "#00BFFF",
+    borderRadius: 8,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  chatItem: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+});
