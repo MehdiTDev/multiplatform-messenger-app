@@ -69,12 +69,12 @@ export default function MyChats() {
             style={{
               paddingVertical: 8,
               paddingHorizontal: 16,
-              backgroundColor: "#9B4DCA",
+              backgroundColor: "#00BFFF",
               borderRadius: 8,
               alignItems: "center",
               flexDirection: "row",
               justifyContent: "center",
-              color: "white",
+              // color: "white",
             }}
           >
             New Group Chat
