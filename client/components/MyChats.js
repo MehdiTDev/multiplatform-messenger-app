@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Box, Text, useToast, Stack } from "native-base";
-import { StyleSheet, Pressable } from "react-native";
+import {
+  Box,
+  Text,
+  useToast,
+  Button,
+  Stack,
+  Icon,
+  PresenceTransition,
+  TouchableOpacity,
+} from "native-base";
 import { ChatState } from "../Context/ChatProvider";
 import ChatLoading from "./ChatLoading";
 import { getSender } from "../config/ChatLogics";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import axios from "axios";
+import { Pressable } from "react-native";
 
 export default function MyChats() {
   const [loggedUser, setLoggedUser] = useState();
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const toast = useToast();
-
-  // Track the hover state of the "New Group Chat" button
-  const [hovered, setHovered] = useState(false);
 
   const fetchChats = async () => {
     try {
@@ -30,8 +36,8 @@ export default function MyChats() {
       setChats(data);
     } catch (error) {
       toast({
-        title: "Error Occurred!",
-        description: "Failed to load the chats",
+        title: "Error Occured!",
+        description: "Failed to Load the chats",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -55,7 +61,6 @@ export default function MyChats() {
       borderRadius="lg"
       borderWidth="1px"
     >
-      {/* Header */}
       <Box
         pb={3}
         px={3}
@@ -68,64 +73,60 @@ export default function MyChats() {
       >
         <Text>My Chats</Text>
         <GroupChatModal>
-          <Pressable
-            onMouseEnter={() => setHovered(true)} // Mouse enter sets hovered to true
-            onMouseLeave={() => setHovered(false)} // Mouse leave sets hovered to false
+          <Text
+            style={{
+              paddingVertical: 8,
+              paddingHorizontal: 16,
+              backgroundColor: "#9B4DCA", // Purple color equivalent
+              borderRadius: 8,
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
           >
-            <Text style={[styles.newGroupChatBtn, hovered && styles.hovered]}>
-              New Group Chat
-            </Text>
-          </Pressable>
+            New Group Chat
+          </Text>
         </GroupChatModal>
       </Box>
 
-      {/* Chat List Container */}
       <Box
         flexDir="column"
         p={3}
         bg="#F8F8F8"
         w="100%"
-        h="calc(100vh - 150px)"
+        h="100%"
         borderRadius="lg"
-        overflowY="auto"
+        overflowY="hidden"
       >
         {chats ? (
-          <Box flex={1} overflowY="auto">
-            <Stack space={3}>
-              {chats.map((chat) => (
-                <Pressable key={chat._id} onPress={() => setSelectedChat(chat)}>
-                  <Box
-                    style={[
-                      styles.chatItem,
-                      {
-                        backgroundColor:
-                          selectedChat === chat ? "#00BFFF" : "#87CEFA",
-                      },
-                    ]}
-                  >
-                    <Text color={selectedChat === chat ? "white" : "black"}>
-                      {!chat.isGroupChat
-                        ? getSender(loggedUser, chat.users)
-                        : chat.chatName}
-                    </Text>
-                    {chat.latestMessage && (
-                      <Text
-                        fontSize="xs"
-                        color={selectedChat === chat ? "white" : "black"}
-                      >
-                        <Text fontWeight="bold">
-                          {chat.latestMessage.sender.name}:
-                        </Text>{" "}
-                        {chat.latestMessage.content.length > 50
-                          ? chat.latestMessage.content.substring(0, 51) + "..."
-                          : chat.latestMessage.content}
-                      </Text>
-                    )}
-                  </Box>
-                </Pressable>
-              ))}
-            </Stack>
-          </Box>
+          <Stack space={3}>
+            {chats.map((chat) => (
+              <Box
+                key={chat._id}
+                onPress={() => setSelectedChat(chat)}
+                cursor="pointer"
+                bg={selectedChat === chat ? "#38B2AC" : "#E8E8E8"}
+                color={selectedChat === chat ? "white" : "black"}
+                px={3}
+                py={2}
+                borderRadius="lg"
+              >
+                <Text>
+                  {!chat.isGroupChat
+                    ? getSender(loggedUser, chat.users)
+                    : chat.chatName}
+                </Text>
+                {chat.latestMessage && (
+                  <Text fontSize="xs">
+                    <b>{chat.latestMessage.sender.name} : </b>
+                    {chat.latestMessage.content.length > 50
+                      ? chat.latestMessage.content.substring(0, 51) + "..."
+                      : chat.latestMessage.content}
+                  </Text>
+                )}
+              </Box>
+            ))}
+          </Stack>
         ) : (
           <ChatLoading />
         )}
@@ -133,24 +134,3 @@ export default function MyChats() {
     </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  newGroupChatBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: "#87CEFA",
-    borderRadius: 8,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center",
-    transition: "background-color 0.3s ease", // Smooth transition effect
-  },
-  hovered: {
-    backgroundColor: "#4682B4", // Change the color when hovered
-  },
-  chatItem: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-});
