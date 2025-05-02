@@ -180,7 +180,7 @@ export default function GroupChatModal({ children }) {
           <Modal.Footer>
             <Button
               onPress={handleSubmit}
-              bg="#87CEFA"
+              bg="#ADD8E6"
               _text={{ color: "black" }}
             >
               Create Group
