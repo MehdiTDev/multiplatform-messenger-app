@@ -69,7 +69,7 @@ export default function MyChats() {
             style={{
               paddingVertical: 8,
               paddingHorizontal: 16,
-              backgroundColor: "#ADD8E6",
+              backgroundColor: "#A1DBF1",
               borderRadius: 8,
               alignItems: "center",
               flexDirection: "row",
@@ -95,7 +95,7 @@ export default function MyChats() {
             {chats.map((chat) => (
               <Pressable key={chat._id} onPress={() => setSelectedChat(chat)}>
                 <Box
-                  bg={selectedChat === chat ? "#00BFFF" : "#ADD8E6"}
+                  bg={selectedChat === chat ? "#00BFFF" : "#A1DBF1"}
                   color={selectedChat === chat ? "white" : "black"}
                   px={3}
                   py={2}
