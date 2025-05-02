@@ -7,7 +7,7 @@ import GroupChatModal from "./miscellaneous/GroupChatModal";
 import axios from "axios";
 import { Pressable } from "react-native";
 
-export default function MyChats() {
+export default function MyChats({ fetchAgain }) {
   const [loggedUser, setLoggedUser] = useState();
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const toast = useToast();
@@ -40,7 +40,7 @@ export default function MyChats() {
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
-  }, []);
+  }, [fetchAgain]);
 
   return (
     <Box

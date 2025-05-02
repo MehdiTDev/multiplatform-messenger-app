@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { Box, VStack, HStack } from "native-base";
 import { ChatState } from "../Context/ChatProvider";
@@ -10,6 +10,7 @@ export default function ChatPage({ navigation }) {
   const { user, selectedChat } = ChatState();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  const [fetchAgain, setFetchAgain] = useState(false);
 
   return (
     <VStack style={styles.mainContainer}>
@@ -20,7 +21,7 @@ export default function ChatPage({ navigation }) {
         {/* Show MyChats if not mobile OR if mobile and no chat is selected */}
         {user && (!isMobile || (isMobile && !selectedChat)) && (
           <Box style={isMobile ? styles.fullWidth : styles.myChats}>
-            <MyChats />
+            <MyChats fetchAgain={fetchAgain} />
           </Box>
         )}
 

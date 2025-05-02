@@ -1,7 +1,7 @@
 import React from "react";
 import { useWindowDimensions } from "react-native";
 import { Box } from "native-base";
-// import SingleChat from "./SingleChat";
+import SingleChat from "./SingleChat";
 import { ChatState } from "../Context/ChatProvider";
 
 const Chatbox = ({ fetchAgain, setFetchAgain }) => {
@@ -26,7 +26,7 @@ const Chatbox = ({ fetchAgain, setFetchAgain }) => {
       borderWidth={1}
       flex={1} // Ensure it grows to fill the available space
     >
-      {/* <SingleChat fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} /> */}
+      <SingleChat fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
     </Box>
   );
 };
