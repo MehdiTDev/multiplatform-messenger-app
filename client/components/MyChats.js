@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Box, Text, useToast, Button, Stack } from "native-base";
+import {
+  Box,
+  Text,
+  useToast,
+  Button,
+  Stack,
+  Icon,
+  PresenceTransition,
+  TouchableOpacity,
+} from "native-base";
 import { ChatState } from "../Context/ChatProvider";
 import ChatLoading from "./ChatLoading";
 import { getSender } from "../config/ChatLogics";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
+import axios from "axios";
+import { Pressable } from "react-native";
 
 export default function MyChats() {
   const [loggedUser, setLoggedUser] = useState();
@@ -66,7 +77,7 @@ export default function MyChats() {
             style={{
               paddingVertical: 8,
               paddingHorizontal: 16,
-              backgroundColor: "#ADD8E6", // Light Blue color
+              backgroundColor: "#9B4DCA", // Purple color equivalent
               borderRadius: 8,
               alignItems: "center",
               flexDirection: "row",
