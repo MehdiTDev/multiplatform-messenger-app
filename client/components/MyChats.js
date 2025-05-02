@@ -99,7 +99,7 @@ export default function MyChats() {
                       styles.chatItem,
                       {
                         backgroundColor:
-                          selectedChat === chat ? "#38B2AC" : "#87CEFA",
+                          selectedChat === chat ? "#00BFFF" : "#87CEFA",
                       },
                     ]}
                   >
