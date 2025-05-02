@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   newGroupChatBtn: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: "#00BFFF",
+    backgroundColor: "#87CEFA",
     borderRadius: 8,
     alignItems: "center",
     flexDirection: "row",
