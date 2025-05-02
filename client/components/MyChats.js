@@ -48,7 +48,7 @@ export default function MyChats() {
       alignItems="center"
       p={3}
       bg="white"
-      w={{ base: "100%", md: "31%" }}
+      w="100%"
       borderRadius="lg"
       borderWidth="1px"
       h="100%"
