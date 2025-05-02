@@ -27,7 +27,6 @@ import ChatLoading from "../ChatLoading";
 import UserListItem from "../userAvatar/UserListItem";
 import axios from "axios";
 
-
 export default function SideDrawer() {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
@@ -35,33 +34,24 @@ export default function SideDrawer() {
   const [loadingChat, setLoadingChat] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclose();
 
-
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
 
-  const toast = useToast()
-
-
+  const toast = useToast();
 
   const logoutHandler = () => {
-
-    localStorage.removeItem("userInfo")
+    localStorage.removeItem("userInfo");
 
     navigation.navigate("HomePage");
-
-  }
+  };
 
   const searchHandler = async () => {
-
     if (!search) {
-
       toast.show({
-
         title: "Failed",
         description: "Please type search words",
         status: "warning",
         duration: 1000,
-        placement: "top-left"
-
+        placement: "top-left",
       });
 
       return;
@@ -70,107 +60,70 @@ export default function SideDrawer() {
     try {
       setLoading(true);
 
-
       const config = {
-
         headers: {
-          Authorization: `Bearer ${user.token}`
+          Authorization: `Bearer ${user.token}`,
         },
       };
 
+      const { data } = await axios.get(
+        `http://localhost:5000/api/user?search=${search}`,
+        config
+      );
 
-      const { data } = await axios.get(`http://localhost:5000/api/user?search=${search}`, config)
+      setLoading(false);
 
-      setLoading(false)
-
-
-
-      setSearchResult(data)
-
-
+      setSearchResult(data);
     } catch (error) {
-
-      console.log("failed to find search results")
+      console.log("failed to find search results");
       toast.show({
-
         title: "Error searching",
         description: "Failed to find results",
         status: "error",
         duration: 1000,
-        placement: "bottom-left"
-
+        placement: "bottom-left",
       });
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-  }
-
+  };
 
   const accessChat = async (userId) => {
-
-    console.log("the user has been clicked")
+    console.log("the user has been clicked");
 
     try {
-      setLoadingChat(true)
+      setLoadingChat(true);
 
       const config = {
-
         headers: {
           "Content-type": "application/json",
-          Authorization: `Bearer ${user.token}`
+          Authorization: `Bearer ${user.token}`,
         },
       };
 
-      const { data } = await axios.post(`http://localhost:5000/api/chat`, { userId }, config);
+      const { data } = await axios.post(
+        `http://localhost:5000/api/chat`,
+        { userId },
+        config
+      );
 
-      //      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]); // va behövs den till ? om chaten redan finns ? 
+      //      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]); // va behövs den till ? om chaten redan finns ?
 
       setSelectedChat(data);
       setLoadingChat(false);
-      console.log(selectedChat)
-      // when printing the selected chat it gives undefined the first time it is created. 
+      console.log(selectedChat);
+      // when printing the selected chat it gives undefined the first time it is created.
       onClose();
-
-
-
-
-
-
     } catch (error) {
-
-      setLoadingChat(false)
+      setLoadingChat(false);
 
       toast.show({
-
         title: "error",
         description: "chat not found",
         status: "error",
         duration: 1000,
-        placement: "top-left"
+        placement: "top-left",
       });
-
     }
-
-
-
-
-
-
-
-  }
-
-
+  };
 
   return (
     <>
@@ -187,7 +140,7 @@ export default function SideDrawer() {
         </Tooltip>
 
         {/* Title */}
-        <Text style={styles.title}>Talk-A-Tive</Text>
+        <Text style={styles.title}>Multi Chat</Text>
 
         {/* Right Menu */}
         <HStack space={4} alignItems="center">
@@ -228,29 +181,20 @@ export default function SideDrawer() {
             </Menu.Item>
 
             <Divider />
-            <Menu.Item onPress={logoutHandler} >Logout</Menu.Item>
+            <Menu.Item onPress={logoutHandler}>Logout</Menu.Item>
           </Menu>
         </HStack>
       </Box>
 
       {/* ActionSheet */}
 
-
-
       <Slide in={isOpen} placement="left" duration={300}>
-        <Box
-          w="300px"
-          h="100%"
-          bg="white"
-          shadow={9}
-          p="5"
-          safeArea
-        >
-          <Text fontSize="xl" mb="4">search users</Text>
+        <Box w="300px" h="100%" bg="white" shadow={9} p="5" safeArea>
+          <Text fontSize="xl" mb="4">
+            search users
+          </Text>
 
           <HStack space={2} w="100%" px={4} mb={3}>
-
-
             <Input
               h={10}
               placeholder="Search by name or email"
@@ -260,35 +204,30 @@ export default function SideDrawer() {
               onChangeText={(text) => setSearch(text)}
             />
 
-            <Button h={10} onPress={searchHandler}>Go</Button>
-
+            <Button h={10} onPress={searchHandler}>
+              Go
+            </Button>
           </HStack>
 
-          {loading ?
-
-            <ChatLoading /> : searchResult?.map(user => (
+          {loading ? (
+            <ChatLoading />
+          ) : (
+            searchResult?.map((user) => (
               <UserListItem
                 key={user._id}
                 user={user}
                 handleFunction={() => accessChat(user._id)}
               />
-            ))}
+            ))
+          )}
 
           {loadingChat && <Spinner ml="auto" d="flex" />}
 
-
-
-          <Button onPress={onClose} position="absolute" bottom={5} width="50%">Close</Button>
+          <Button onPress={onClose} position="absolute" bottom={5} width="50%">
+            Close
+          </Button>
         </Box>
       </Slide>
-
-
-
-
-
-
-
-
     </>
   );
 }

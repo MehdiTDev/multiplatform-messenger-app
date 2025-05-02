@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Box, Text, useToast, Button, Stack, Icon, PresenceTransition, TouchableOpacity } from "native-base";
+import {
+  Box,
+  Text,
+  useToast,
+  Button,
+  Stack,
+  Icon,
+  PresenceTransition,
+  TouchableOpacity,
+} from "native-base";
 import { ChatState } from "../Context/ChatProvider";
 import ChatLoading from "./ChatLoading";
 import { getSender } from "../config/ChatLogics";
@@ -7,18 +16,12 @@ import GroupChatModal from "./miscellaneous/GroupChatModal";
 import axios from "axios";
 import { Pressable } from "react-native";
 
-
-
 export default function MyChats() {
-
-
-
-  const [loggedUser, setLoggedUser] = useState()
+  const [loggedUser, setLoggedUser] = useState();
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
-  const toast = useToast()
+  const toast = useToast();
 
   const fetchChats = async () => {
-
     try {
       const config = {
         headers: {
@@ -26,7 +29,10 @@ export default function MyChats() {
         },
       };
 
-      const { data } = await axios.get("http://localhost:5000/api/chat", config);
+      const { data } = await axios.get(
+        "http://localhost:5000/api/chat",
+        config
+      );
       setChats(data);
     } catch (error) {
       toast({
@@ -45,9 +51,7 @@ export default function MyChats() {
     fetchChats();
   }, []);
 
-
   return (
-
     <Box
       flexDir={{ base: selectedChat ? "none" : "column", md: "column" }}
       alignItems="center"
@@ -73,7 +77,7 @@ export default function MyChats() {
             style={{
               paddingVertical: 8,
               paddingHorizontal: 16,
-              backgroundColor: "#9B4DCA", // Purple color equivalent
+              backgroundColor: "#00BFFF", // Purple color equivalent
               borderRadius: 8,
               alignItems: "center",
               flexDirection: "row",
@@ -81,9 +85,7 @@ export default function MyChats() {
             }}
           >
             New Group Chat
-
           </Text>
-
         </GroupChatModal>
       </Box>
 
@@ -130,8 +132,5 @@ export default function MyChats() {
         )}
       </Box>
     </Box>
-
   );
-};
-
-
+}
