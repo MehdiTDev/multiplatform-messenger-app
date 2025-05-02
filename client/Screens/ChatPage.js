@@ -4,7 +4,7 @@ import { Box, VStack, HStack } from "native-base";
 import { ChatState } from "../Context/ChatProvider";
 import SideDrawer from "../components/miscellaneous/SideDrawer";
 import MyChats from "../components/MyChats";
-import ChatBox from "../components/ChatBox";
+import Chatbox from "../components/Chatbox";
 
 export default function ChatPage({ navigation }) {
   const { user } = ChatState();
@@ -17,7 +17,7 @@ export default function ChatPage({ navigation }) {
       {/* Horizontal chat area with space-between */}
       <HStack style={styles.chatContainer}>
         {user && <MyChats style={styles.myChats} />}
-        {user && <ChatBox style={styles.chatBox} />}
+        {user && <Chatbox style={styles.chatbox} />}
       </HStack>
     </VStack>
   );
