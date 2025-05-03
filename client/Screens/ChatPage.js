@@ -4,7 +4,7 @@ import { Box, VStack, HStack } from "native-base";
 import { ChatState } from "../Context/ChatProvider";
 import SideDrawer from "../components/miscellaneous/SideDrawer";
 import MyChats from "../components/MyChats";
-import Chatbox from "../components/Chatbox";
+import Chatbox from "../components/ChatBox";
 
 export default function ChatPage({ navigation }) {
   const { user, selectedChat } = ChatState();
@@ -13,6 +13,7 @@ export default function ChatPage({ navigation }) {
   const [fetchAgain, setFetchAgain] = useState(false);
 
   return (
+
     <VStack style={styles.mainContainer}>
       {/* SideDrawer at the top */}
       {user && <SideDrawer />}

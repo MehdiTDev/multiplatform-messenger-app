@@ -5,7 +5,7 @@ import ChatLoading from "./ChatLoading";
 import { getSender } from "../config/ChatLogics";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import axios from "axios";
-import { Pressable } from "react-native";
+import { Pressable, Button } from "react-native";
 
 export default function MyChats({ fetchAgain }) {
   const [loggedUser, setLoggedUser] = useState();
@@ -42,6 +42,13 @@ export default function MyChats({ fetchAgain }) {
     fetchChats();
   }, [fetchAgain]);
 
+
+  const setTheChat = (theChat) => {
+
+    setSelectedChat(theChat)
+    return;
+
+  }
   return (
     <Box
       flexDir="column"
@@ -93,7 +100,15 @@ export default function MyChats({ fetchAgain }) {
         {chats ? (
           <Stack space={3}>
             {chats.map((chat) => (
-              <Pressable key={chat._id} onPress={() => setSelectedChat(chat)}>
+              <Pressable key={chat._id} onPress={() => {
+
+
+                setTheChat(chat)
+                //console.log(selectedChat)
+
+
+
+              }}>
                 <Box
                   bg={selectedChat === chat ? "#00BFFF" : "#A1DBF1"}
                   color={selectedChat === chat ? "white" : "black"}
@@ -125,3 +140,4 @@ export default function MyChats({ fetchAgain }) {
     </Box>
   );
 }
+

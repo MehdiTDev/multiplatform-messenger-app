@@ -9,6 +9,7 @@ import {
   HStack,
   useToast,
   ArrowBackIcon,
+  Icon,
 } from "native-base";
 import { ScrollView } from "react-native";
 import { ChatState } from "../Context/ChatProvider";
@@ -33,6 +34,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
 
+
   const toast = useToast();
   const { selectedChat, setSelectedChat, user, notification, setNotification } =
     ChatState();
@@ -51,7 +53,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       setLoading(true);
 
       const { data } = await axios.get(
-        `/api/message/${selectedChat._id}`,
+        `${ENDPOINT}/api/message/${selectedChat._id}`,
         config
       );
       setMessages(data);
@@ -81,7 +83,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         },
       };
       const { data } = await axios.post(
-        "/api/message",
+        `${ENDPOINT}/api/message`,
         {
           content: newMessage,
           chatId: selectedChat._id,
@@ -167,6 +169,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     );
   }
 
+
   return (
     <VStack flex={1} px={3} py={2} space={2}>
       <HStack justifyContent="space-between" alignItems="center" width="100%">
@@ -182,21 +185,22 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         </Text>
 
         <HStack space={2} alignItems="center">
-          {/* Eye Icon Button */}
-          <IconButton
-            icon={<MaterialIcons name="visibility" size={24} color="gray" />}
-            onPress={() => {
-              // Open the profile modal of the user you're chatting with
-              console.log("View details clicked");
-            }}
-            variant="ghost"
-            size="sm"
-          />
+          {/* Eye Icon Button  */}
 
-          {/* Profile Modal for user you're chatting with */}
-          {!selectedChat.isGroupChat && (
-            <ProfileModal user={getSenderFull(user, selectedChat.users)} />
-          )}
+
+          {!selectedChat.isGroupChat ?
+
+            <ProfileModal user={getSenderFull(user, selectedChat.users)}>
+              <Icon as={MaterialIcons} name="visibility" size={6} />
+            </ProfileModal>
+
+            :
+
+            <UpdateGroupChatModal fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+
+
+          }
+
         </HStack>
       </HStack>
 
