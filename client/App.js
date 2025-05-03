@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet } from "react-native";
+import { StyleSheet, ActivityIndicator, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NativeBaseProvider } from "native-base";
@@ -8,7 +8,7 @@ import { NativeBaseProvider } from "native-base";
 // Screens
 import ChatPage from "./Screens/ChatPage";
 import HomePage from "./Screens/HomePage";
-import ChatProvider from "./Context/ChatProvider";
+import ChatProvider, { ChatState } from "./Context/ChatProvider";
 
 const Stack = createNativeStackNavigator();
 
@@ -17,17 +17,34 @@ export default function App() {
     console.log("App has started!");
   }, []);
 
+  const AppContent = () => {
+    const { user, loading } = ChatState(); // Access `user` and `loading` states
+
+    // Show a loading indicator while checking authentication
+    if (loading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#00BFFF" />
+        </View>
+      );
+    }
+
+    return (
+      <Stack.Navigator
+        initialRouteName={user ? "ChatPage" : "HomePage"} // Navigate based on user authentication
+        screenOptions={{ headerShown: false }}
+      >
+        <Stack.Screen name="HomePage" component={HomePage} />
+        <Stack.Screen name="ChatPage" component={ChatPage} />
+      </Stack.Navigator>
+    );
+  };
+
   return (
     <NativeBaseProvider>
       <NavigationContainer>
         <ChatProvider>
-          <Stack.Navigator
-            initialRouteName="HomePage"
-            screenOptions={{ headerShown: false }}
-          >
-            <Stack.Screen name="HomePage" component={HomePage} />
-            <Stack.Screen name="ChatPage" component={ChatPage} />
-          </Stack.Navigator>
+          <AppContent />
         </ChatProvider>
         <StatusBar style="auto" />
       </NavigationContainer>
@@ -36,10 +53,10 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  loadingContainer: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
 });

@@ -10,8 +10,11 @@ import {
 } from "native-base";
 import { StyleSheet } from "react-native";
 import axios from "axios";
+import { ChatState } from "../../Context/ChatProvider";
 
 export default function Login({ navigation }) {
+  const { setUser } = ChatState();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -48,6 +51,9 @@ export default function Login({ navigation }) {
         config
       );
 
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      setUser(data);
+
       toast.show({
         title: "Success",
         description: "Logged in successfully",
@@ -57,7 +63,6 @@ export default function Login({ navigation }) {
         placement: "bottom",
       });
 
-      localStorage.setItem("userInfo", JSON.stringify(data));
       navigation.navigate("ChatPage");
     } catch (error) {
       toast.show({

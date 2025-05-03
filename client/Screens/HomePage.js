@@ -9,11 +9,10 @@ export default function HomePage({ navigation }) {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("userInfo"));
-
     if (user) {
       navigation.navigate("ChatPage");
     }
-  }, []);
+  }, [navigation]);
 
   return (
     <NativeBaseProvider>
