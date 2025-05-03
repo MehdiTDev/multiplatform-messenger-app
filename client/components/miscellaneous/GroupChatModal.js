@@ -39,9 +39,9 @@ export default function GroupChatModal({ children }) {
         setSelectedUsers([...selectedUsers, userToAdd]);
     };
 
-    const handleSearch = async () => {
-        // setSearch(query);
-        if (!search) {
+    const handleSearch = async (query) => {
+        setSearch(query);
+        if (!query) {
             return;
         }
 
@@ -53,7 +53,7 @@ export default function GroupChatModal({ children }) {
                 },
             };
             const { data } = await axios.get(
-                `http://localhost:5000/api/user?search=${search}`,
+                `http://localhost:5000/api/user?search=${query}`,
                 config
             );
             console.log(data);
@@ -144,14 +144,10 @@ export default function GroupChatModal({ children }) {
                                 onChangeText={(text) => setGroupChatName(text)}
                             />
                         </FormControl>
-                        <FormControl>
+                        <FormControl mb={2}>
                             <Input
                                 placeholder="Add Users"
-                                mb={1}
-                                onChangeText={(text) => {
-                                    setSearch(text);
-                                    handleSearch();
-                                }}
+                                onChangeText={handleSearch}
                             />
                         </FormControl>
                         <Box w="100%" flexDirection="row" flexWrap="wrap">
