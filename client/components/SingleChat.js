@@ -8,10 +8,11 @@ import {
   VStack,
   HStack,
   useToast,
+  ArrowBackIcon,
 } from "native-base";
 import { ScrollView } from "react-native";
-import { ArrowBackIcon } from "native-base";
 import { ChatState } from "../Context/ChatProvider";
+import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
 import io from "socket.io-client";
 import { getSender, getSenderFull } from "../config/ChatLogics";
@@ -36,6 +37,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const { selectedChat, setSelectedChat, user, notification, setNotification } =
     ChatState();
 
+  // Fetch messages from the server
   const fetchMessages = async () => {
     if (!selectedChat) return;
 
@@ -66,6 +68,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
+  // Send a new message to the server
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
 
@@ -99,6 +102,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
+  // Handle typing indicator
   const typingHandler = (text) => {
     setNewMessage(text);
 
@@ -122,6 +126,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }, timerLength);
   };
 
+  // Set up socket connection
   useEffect(() => {
     socket = io(ENDPOINT);
     socket.emit("setup", user);
@@ -130,11 +135,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     socket.on("stop typing", () => setIsTyping(false));
   }, []);
 
+  // Fetch messages when selected chat changes
   useEffect(() => {
     fetchMessages();
     selectedChatCompare = selectedChat;
   }, [selectedChat]);
 
+  // Listen for incoming messages
   useEffect(() => {
     socket.on("message received", (newMessageReceived) => {
       if (
@@ -151,6 +158,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     });
   });
 
+  // If no selected chat, show a message prompting the user to select one
   if (!selectedChat) {
     return (
       <Box flex={1} alignItems="center" justifyContent="center">
@@ -161,7 +169,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   return (
     <VStack flex={1} px={3} py={2} space={2}>
-      <HStack justifyContent="space-between" alignItems="center">
+      <HStack justifyContent="space-between" alignItems="center" width="100%">
         <IconButton
           icon={<ArrowBackIcon />}
           onPress={() => setSelectedChat(null)}
@@ -172,42 +180,58 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             ? getSender(user, selectedChat.users)
             : selectedChat.chatName.toUpperCase()}
         </Text>
-        {!selectedChat.isGroupChat ? (
-          <ProfileModal user={getSenderFull(user, selectedChat.users)} />
-        ) : (
-          <UpdateGroupChatModal
-            fetchMessages={fetchMessages}
-            fetchAgain={fetchAgain}
-            setFetchAgain={setFetchAgain}
+
+        <HStack space={2} alignItems="center">
+          {/* Eye Icon Button */}
+          <IconButton
+            icon={<MaterialIcons name="visibility" size={24} color="gray" />}
+            onPress={() => {
+              // Open the profile modal of the user you're chatting with
+              console.log("View details clicked");
+            }}
+            variant="ghost"
+            size="sm"
           />
-        )}
+
+          {/* Profile Modal for user you're chatting with */}
+          {!selectedChat.isGroupChat && (
+            <ProfileModal user={getSenderFull(user, selectedChat.users)} />
+          )}
+        </HStack>
       </HStack>
 
       <Box flex={1} bg="#E8E8E8" borderRadius="lg" p={2}>
-        {loading ? (
-          <Spinner size="lg" alignSelf="center" />
-        ) : (
-          <ScrollView>
-            <ScrollableChat messages={messages} />
-          </ScrollView>
-        )}
+        {/* Scrollable chat messages */}
+        <ScrollableChat messages={messages} />
+
+        {/* Typing animation */}
         {istyping && (
           <LottieView
             source={animationData}
             autoPlay
             loop
-            style={{ width: 60, height: 40 }}
+            style={{ width: 70, height: 70 }}
           />
         )}
-        <Input
-          variant="filled"
-          bg="#E0E0E0"
-          placeholder="Enter a message..."
-          value={newMessage}
-          onChangeText={typingHandler}
-          onSubmitEditing={sendMessage}
-          mt={2}
-        />
+
+        {/* Input field for new messages */}
+        <HStack>
+          <Input
+            variant="filled"
+            placeholder="Type a message"
+            value={newMessage}
+            onChangeText={typingHandler}
+            bg="white"
+            borderRadius="full"
+            flex={1}
+          />
+          <IconButton
+            icon={<MaterialIcons name="send" size={24} color="gray" />}
+            onPress={sendMessage}
+            variant="ghost"
+            size="sm"
+          />
+        </HStack>
       </Box>
     </VStack>
   );
