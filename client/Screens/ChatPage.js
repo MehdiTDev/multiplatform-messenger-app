@@ -1,24 +1,37 @@
-import React from "react";
-import { StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, useWindowDimensions } from "react-native";
 import { Box, VStack, HStack } from "native-base";
 import { ChatState } from "../Context/ChatProvider";
 import SideDrawer from "../components/miscellaneous/SideDrawer";
 import MyChats from "../components/MyChats";
-import ChatBox from "../components/ChatBox";
+import Chatbox from "../components/Chatbox";
 
 export default function ChatPage({ navigation }) {
-  const { user } = ChatState();
+  const { user, selectedChat } = ChatState();
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
+  const [fetchAgain, setFetchAgain] = useState(false);
 
   return (
 
     <VStack style={styles.mainContainer}>
       {/* SideDrawer at the top */}
       {user && <SideDrawer />}
-
-      {/* Horizontal chat area with space-between */}
+      {/* Horizontal chat area */}
       <HStack style={styles.chatContainer}>
-        {user && <MyChats style={styles.myChats} />}
-        {user && <ChatBox style={styles.chatBox} />}
+        {/* Show MyChats if not mobile OR if mobile and no chat is selected */}
+        {user && (!isMobile || (isMobile && !selectedChat)) && (
+          <Box style={isMobile ? styles.fullWidth : styles.myChats}>
+            <MyChats fetchAgain={fetchAgain} />
+          </Box>
+        )}
+
+        {/* Show Chatbox if not mobile OR if mobile and chat is selected */}
+        {user && (!isMobile || (isMobile && selectedChat)) && (
+          <Box style={isMobile ? styles.fullWidth : styles.chatBox}>
+            <Chatbox />
+          </Box>
+        )}
       </HStack>
     </VStack>
   );
@@ -32,13 +45,17 @@ const styles = StyleSheet.create({
   chatContainer: {
     flex: 1,
     width: "100%",
-    justifyContent: "space-between",
-    padding: 10, // equivalent to p={2} in NativeBase
+    flexDirection: "row",
+    padding: 10,
   },
   myChats: {
-    width: "30%",
+    width: "30%", // Adjust the width as needed for larger screens
+    marginRight: 10,
   },
   chatBox: {
-    width: "68%",
+    flex: 1, // Takes the remaining space
+  },
+  fullWidth: {
+    width: "100%",
   },
 });

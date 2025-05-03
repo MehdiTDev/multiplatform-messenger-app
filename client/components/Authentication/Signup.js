@@ -11,8 +11,11 @@ import {
 import { StyleSheet, Image } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
+import { ChatState } from "../../Context/ChatProvider";
 
 export default function Signup({ navigation }) {
+  const { setUser } = ChatState();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -158,6 +161,8 @@ export default function Signup({ navigation }) {
       );
 
       localStorage.setItem("userInfo", JSON.stringify(data));
+
+      setUser(data);
 
       setLoading(false);
 
