@@ -175,19 +175,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   return (
     <VStack flex={1} px={3} py={2} space={2}>
-      <HStack justifyContent="space-between" alignItems="center" width="100%">
+      <HStack alignItems="center" justifyContent="space-between" width="100%">
         <IconButton
           icon={<ArrowBackIcon />}
           onPress={() => setSelectedChat(null)}
           display={{ base: "flex", md: "none" }}
         />
-        <Text fontSize="xl" fontWeight="bold">
-          {!selectedChat.isGroupChat
-            ? getSender(user, selectedChat.users)
-            : selectedChat.chatName.toUpperCase()}
-        </Text>
 
-        <HStack space={2} alignItems="center">
+        <HStack flex={1} alignItems="center" justifyContent="space-between">
+          <Text fontSize="xl" fontWeight="bold">
+            {!selectedChat.isGroupChat
+              ? getSender(user, selectedChat.users)
+              : selectedChat.chatName.toUpperCase()}
+          </Text>
           {!selectedChat.isGroupChat ? (
             <ProfileModal user={getSenderFull(user, selectedChat.users)}>
               <Icon as={MaterialIcons} name="visibility" size={6} />

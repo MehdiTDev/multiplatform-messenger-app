@@ -17,14 +17,12 @@ const Chatbox = ({ fetchAgain, setFetchAgain }) => {
 
   return (
     <Box
-      alignItems="center"
-      flexDirection="column"
-      p={3}
+      flex={1}
+      w="100%"
+      px={4} // Add padding on x-axis
+      py={2} // Optional vertical padding
       bg="white"
-      w={isMobile ? "100%" : "100%"} // Make it take full width on larger screens
       borderRadius="lg"
-      borderWidth={1}
-      flex={1} // Ensure it grows to fill the available space
     >
       <SingleChat fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
     </Box>
