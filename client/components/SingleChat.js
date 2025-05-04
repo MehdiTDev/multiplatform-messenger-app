@@ -34,7 +34,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
 
-
   const toast = useToast();
   const { selectedChat, setSelectedChat, user, notification, setNotification } =
     ChatState();
@@ -169,7 +168,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     );
   }
 
-
   return (
     <VStack flex={1} px={3} py={2} space={2}>
       <HStack justifyContent="space-between" alignItems="center" width="100%">
@@ -187,26 +185,32 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         <HStack space={2} alignItems="center">
           {/* Eye Icon Button  */}
 
-
-          {!selectedChat.isGroupChat ?
-
+          {!selectedChat.isGroupChat ? (
             <ProfileModal user={getSenderFull(user, selectedChat.users)}>
               <Icon as={MaterialIcons} name="visibility" size={6} />
             </ProfileModal>
-
-            :
-
-            <UpdateGroupChatModal fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
-
-
-          }
-
+          ) : (
+            <UpdateGroupChatModal
+              fetchAgain={fetchAgain}
+              setFetchAgain={setFetchAgain}
+            />
+          )}
         </HStack>
       </HStack>
 
       <Box flex={1} bg="#E8E8E8" borderRadius="lg" p={2}>
         {/* Scrollable chat messages */}
-        <ScrollableChat messages={messages} />
+        <Box
+          flex={1}
+          bg="white"
+          borderRadius="lg"
+          px={3}
+          py={2}
+          mb={2}
+          width="100%"
+        >
+          <ScrollableChat messages={messages} />
+        </Box>
 
         {/* Typing animation */}
         {istyping && (
@@ -219,7 +223,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         )}
 
         {/* Input field for new messages */}
-        <HStack>
+        <HStack space={2}>
           <Input
             variant="filled"
             placeholder="Type a message"
