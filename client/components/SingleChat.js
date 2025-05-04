@@ -59,7 +59,18 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       setLoading(false);
 
       socket.emit("join chat", selectedChat._id);
+
+      // Show toast if no messages exist yet
+      if (data.length === 0) {
+        toast.show({
+          title: "No messages yet!",
+          description: "Start the conversation!",
+          status: "info",
+          duration: 3000,
+        });
+      }
     } catch (error) {
+      setLoading(false);
       toast.show({
         title: "Error Occurred!",
         description: "Failed to load the messages",
@@ -209,7 +220,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           mb={2}
           width="100%"
         >
-          <ScrollableChat messages={messages} />
+          {loading ? (
+            <Spinner size="lg" color="blue.500" />
+          ) : (
+            <ScrollableChat messages={messages} />
+          )}
         </Box>
 
         {/* Typing animation */}
