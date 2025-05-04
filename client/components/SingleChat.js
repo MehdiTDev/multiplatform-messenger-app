@@ -38,7 +38,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const { selectedChat, setSelectedChat, user, notification, setNotification } =
     ChatState();
 
-  // Fetch messages from the server
   const fetchMessages = async () => {
     if (!selectedChat) return;
 
@@ -50,7 +49,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       };
 
       setLoading(true);
-
       const { data } = await axios.get(
         `${ENDPOINT}/api/message/${selectedChat._id}`,
         config
@@ -60,7 +58,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
       socket.emit("join chat", selectedChat._id);
 
-      // Show toast if no messages exist yet
       if (data.length === 0) {
         toast.show({
           title: "No messages yet!",
@@ -80,11 +77,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
-  // Send a new message to the server
   const sendMessage = async () => {
-    if (!newMessage.trim()) return;
-
+    if (!newMessage) return;
     socket.emit("stop typing", selectedChat._id);
+
     try {
       const config = {
         headers: {
@@ -92,6 +88,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
+      setNewMessage("");
       const { data } = await axios.post(
         `${ENDPOINT}/api/message`,
         {
@@ -101,20 +98,20 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         config
       );
 
-      setNewMessage("");
       socket.emit("new message", data);
-      setMessages((prev) => [...prev, data]);
+      setMessages([...messages, data]);
     } catch (error) {
       toast.show({
-        title: "Error Occurred!",
-        description: "Failed to send the message",
+        title: "Error Occured!",
+        description: "Failed to send the Message",
         status: "error",
         duration: 5000,
+        isClosable: true,
+        placement: "bottom",
       });
     }
   };
 
-  // Handle typing indicator
   const typingHandler = (text) => {
     setNewMessage(text);
 
@@ -124,6 +121,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       setTyping(true);
       socket.emit("typing", selectedChat._id);
     }
+
     let lastTypingTime = new Date().getTime();
     const timerLength = 3000;
 
@@ -138,7 +136,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }, timerLength);
   };
 
-  // Set up socket connection
   useEffect(() => {
     socket = io(ENDPOINT);
     socket.emit("setup", user);
@@ -147,20 +144,18 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     socket.on("stop typing", () => setIsTyping(false));
   }, []);
 
-  // Fetch messages when selected chat changes
   useEffect(() => {
     fetchMessages();
     selectedChatCompare = selectedChat;
   }, [selectedChat]);
 
-  // Listen for incoming messages
   useEffect(() => {
     socket.on("message received", (newMessageReceived) => {
       if (
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageReceived.chat._id
       ) {
-        if (!notification.includes(newMessageReceived)) {
+        if (!notification.some((n) => n._id === newMessageReceived._id)) {
           setNotification([newMessageReceived, ...notification]);
           setFetchAgain((prev) => !prev);
         }
@@ -170,7 +165,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     });
   });
 
-  // If no selected chat, show a message prompting the user to select one
   if (!selectedChat) {
     return (
       <Box flex={1} alignItems="center" justifyContent="center">
@@ -194,8 +188,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         </Text>
 
         <HStack space={2} alignItems="center">
-          {/* Eye Icon Button  */}
-
           {!selectedChat.isGroupChat ? (
             <ProfileModal user={getSenderFull(user, selectedChat.users)}>
               <Icon as={MaterialIcons} name="visibility" size={6} />
@@ -204,13 +196,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             <UpdateGroupChatModal
               fetchAgain={fetchAgain}
               setFetchAgain={setFetchAgain}
+              fetchMessages={fetchMessages}
             />
           )}
         </HStack>
       </HStack>
 
       <Box flex={1} bg="#E8E8E8" borderRadius="lg" p={2}>
-        {/* Scrollable chat messages */}
         <Box
           flex={1}
           bg="white"
@@ -221,13 +213,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           width="100%"
         >
           {loading ? (
-            <Spinner size="lg" color="blue.500" />
+            <Box flex={1} justifyContent="center" alignItems="center">
+              <Spinner size="lg" color="blue.500" />
+            </Box>
           ) : (
             <ScrollableChat messages={messages} />
           )}
         </Box>
 
-        {/* Typing animation */}
         {istyping && (
           <LottieView
             source={animationData}
@@ -237,8 +230,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           />
         )}
 
-        {/* Input field for new messages */}
-        <HStack space={2}>
+        <HStack space={2} alignItems="center">
           <Input
             variant="filled"
             placeholder="Type a message"
@@ -247,6 +239,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             bg="white"
             borderRadius="full"
             flex={1}
+            onSubmitEditing={() => {
+              console.log("Sending message:", newMessage);
+              sendMessage();
+            }}
           />
           <IconButton
             icon={<MaterialIcons name="send" size={24} color="gray" />}
