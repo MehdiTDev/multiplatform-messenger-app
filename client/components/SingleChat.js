@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Text,
@@ -23,8 +23,9 @@ import ProfileModal from "./miscellaneous/ProfileModal";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import ScrollableChat from "./ScrollableChat";
 
+// NOTE: Replace with your local IP if testing on a mobile device
 const ENDPOINT = "http://localhost:5000";
-let socket, selectedChatCompare;
+let socket;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
@@ -37,6 +38,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const toast = useToast();
   const { selectedChat, setSelectedChat, user, notification, setNotification } =
     ChatState();
+
+  const selectedChatCompare = useRef();
 
   const fetchMessages = async () => {
     if (!selectedChat) return;
@@ -88,7 +91,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      setNewMessage("");
       const { data } = await axios.post(
         `${ENDPOINT}/api/message`,
         {
@@ -98,11 +100,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         config
       );
 
+      setNewMessage("");
       socket.emit("new message", data);
-      setMessages([...messages, data]);
+      setMessages((prev) => [...prev, data]);
     } catch (error) {
       toast.show({
-        title: "Error Occured!",
+        title: "Error Occurred!",
         description: "Failed to send the Message",
         status: "error",
         duration: 5000,
@@ -137,32 +140,42 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   };
 
   useEffect(() => {
+    if (!user) return;
+
     socket = io(ENDPOINT);
     socket.emit("setup", user);
     socket.on("connected", () => setSocketConnected(true));
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
-  }, []);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user]);
 
   useEffect(() => {
     fetchMessages();
-    selectedChatCompare = selectedChat;
+    selectedChatCompare.current = selectedChat;
   }, [selectedChat]);
 
   useEffect(() => {
     socket.on("message received", (newMessageReceived) => {
       if (
-        !selectedChatCompare ||
-        selectedChatCompare._id !== newMessageReceived.chat._id
+        !selectedChatCompare.current ||
+        selectedChatCompare.current._id !== newMessageReceived.chat._id
       ) {
         if (!notification.some((n) => n._id === newMessageReceived._id)) {
-          setNotification([newMessageReceived, ...notification]);
+          setNotification((prev) => [newMessageReceived, ...prev]);
           setFetchAgain((prev) => !prev);
         }
       } else {
         setMessages((prev) => [...prev, newMessageReceived]);
       }
     });
+
+    return () => {
+      socket.off("message received");
+    };
   });
 
   if (!selectedChat) {
@@ -239,10 +252,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             bg="white"
             borderRadius="full"
             flex={1}
-            onSubmitEditing={() => {
-              console.log("Sending message:", newMessage);
-              sendMessage();
-            }}
+            onSubmitEditing={sendMessage}
           />
           <IconButton
             icon={<MaterialIcons name="send" size={24} color="gray" />}
