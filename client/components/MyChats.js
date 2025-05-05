@@ -57,7 +57,6 @@ export default function MyChats({ fetchAgain }) {
       bg="white"
       w="100%"
       borderRadius="lg"
-      borderWidth="1px"
       h="100%"
     >
       <Box

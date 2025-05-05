@@ -16,6 +16,7 @@ import {
   useDisclose,
   Tooltip,
   useToast,
+  Stack,
 } from "native-base";
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
@@ -72,15 +73,8 @@ export default function SideDrawer() {
     navigation.navigate("HomePage");
   };
 
-  const searchHandler = async () => {
-    if (!search) {
-      toast.show({
-        title: "Failed",
-        description: "Please type search words",
-        status: "warning",
-        duration: 1000,
-        placement: "top-left",
-      });
+  const searchHandler = async (query) => {
+    if (!query) {
       return;
     }
 
@@ -94,7 +88,7 @@ export default function SideDrawer() {
       };
 
       const { data } = await axios.get(
-        `http://localhost:5000/api/user?search=${search}`,
+        `http://localhost:5000/api/user?search=${query}`,
         config
       );
 
@@ -229,8 +223,27 @@ export default function SideDrawer() {
       </Box>
 
       {/* Slide-out Drawer */}
+
+
+      {isOpen && (
+        <Pressable
+          onPress={onClose}
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bg="transparent"
+          zIndex={9}
+        />
+      )}
+
+
+
+
+
       <Slide in={isOpen} placement="left" duration={300}>
-        <Box w="300px" h="100%" bg="white" shadow={9} p="5" safeArea>
+        <Box w="300px" h="100%" bg="white" shadow={9} p="5" safeArea zIndex={10} >
           <Text fontSize="xl" mb="4">
             Search users
           </Text>
@@ -239,32 +252,34 @@ export default function SideDrawer() {
             <Input
               h={10}
               placeholder="Search by name or email"
-              value={search}
               bg="gray.100"
-              onChangeText={(text) => setSearch(text)}
+              onChangeText={searchHandler}
             />
-            <Button h={10} onPress={searchHandler}>
-              Go
-            </Button>
+
           </HStack>
 
-          {loading ? (
-            <ChatLoading />
-          ) : (
-            searchResult?.map((user) => (
-              <UserListItem
-                key={user._id}
-                user={user}
-                handleFunction={() => accessChat(user._id)}
-              />
-            ))
-          )}
+
+          <Box maxHeight="80%" overflowY="auto">
+            <Stack>
+
+              {loading ? (
+                <ChatLoading />
+              ) : (
+
+                searchResult?.map((user) => (
+                  <UserListItem
+                    key={user._id}
+                    user={user}
+                    handleFunction={() => accessChat(user._id)}
+                  />
+                ))
+
+              )}
+            </Stack>
+          </Box>
 
           {loadingChat && <Spinner ml="auto" d="flex" />}
 
-          <Button onPress={onClose} position="absolute" bottom={5} width="50%">
-            Close
-          </Button>
         </Box>
       </Slide>
     </>
