@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet } from "react-native";
 import { Box, Avatar, Text, Tooltip } from "native-base";
 import {
   isLastMessage,
+  isSameSender,
   isSameSenderMargin,
   isSameUser,
 } from "../config/ChatLogics";
@@ -20,7 +21,8 @@ const ScrollableChat = ({ messages }) => {
         messages.map((m, i) => {
           const isFromCurrentUser = m.sender._id === user._id;
           const showAvatar =
-            !isFromCurrentUser && isLastMessage(messages, i, user._id);
+            isSameSender(messages, m, i, user._id) ||
+            isLastMessage(messages, i, user._id);
 
           return (
             <Box
@@ -31,45 +33,33 @@ const ScrollableChat = ({ messages }) => {
               mb={2}
               px={2}
             >
-              {/* Received Messages (Left Side) */}
-              {!isFromCurrentUser && (
-                <Box flexDirection="row" alignItems="flex-end" maxWidth="80%">
-                  {showAvatar && (
-                    <Tooltip label={m.sender.name} openDelay={500}>
-                      <Avatar
-                        mt={1}
-                        mr={2}
-                        size="sm"
-                        source={{ uri: m.sender.pic }}
-                      />
-                    </Tooltip>
-                  )}
-                  <Box
-                    bg="#B9F5D0"
-                    ml={isSameSenderMargin(messages, m, i, user._id)}
-                    mt={isSameUser(messages, m, i, user._id) ? 1 : 3}
-                    px={4}
-                    py={2}
-                    borderRadius="2xl"
-                  >
-                    <Text>{m.content}</Text>
-                  </Box>
-                </Box>
+              {!isFromCurrentUser && showAvatar && (
+                <Tooltip label={m.sender.name} openDelay={500}>
+                  <Avatar
+                    mt={1}
+                    mr={2}
+                    size="sm"
+                    source={{ uri: m.sender.pic }}
+                    name={m.sender.name}
+                  />
+                </Tooltip>
               )}
 
-              {/* Sent Messages (Right Side) */}
-              {isFromCurrentUser && (
-                <Box
-                  bg="#BEE3F8"
-                  mt={isSameUser(messages, m, i, user._id) ? 1 : 3}
-                  px={4}
-                  py={2}
-                  borderRadius="2xl"
-                  maxWidth="80%"
-                >
-                  <Text>{m.content}</Text>
-                </Box>
-              )}
+              <Box
+                bg={isFromCurrentUser ? "#BEE3F8" : "#B9F5D0"}
+                ml={
+                  !isFromCurrentUser
+                    ? isSameSenderMargin(messages, m, i, user._id)
+                    : 0
+                }
+                mt={isSameUser(messages, m, i, user._id) ? 1 : 3}
+                px={4}
+                py={2}
+                borderRadius="2xl"
+                maxWidth="75%"
+              >
+                <Text>{m.content}</Text>
+              </Box>
             </Box>
           );
         })}
