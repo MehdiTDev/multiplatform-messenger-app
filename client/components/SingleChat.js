@@ -217,7 +217,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         </HStack>
       </HStack>
 
-      <Box flex={1} bg="#E8E8E8" borderRadius="lg" p={2}>
+      <Box flex={1} bg="#00BFFF" borderRadius="lg" p={2}>
         <Box
           flex={1}
           bg="white"
