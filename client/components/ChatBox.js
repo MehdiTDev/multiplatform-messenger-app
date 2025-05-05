@@ -16,14 +16,7 @@ const Chatbox = ({ fetchAgain, setFetchAgain }) => {
   }
 
   return (
-    <Box
-      flex={1}
-      w="100%"
-      px={4} // Add padding on x-axis
-      py={2} // Optional vertical padding
-      bg="white"
-      borderRadius="lg"
-    >
+    <Box flex={1} w="100%" bg="white" borderRadius="lg">
       <SingleChat fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
     </Box>
   );

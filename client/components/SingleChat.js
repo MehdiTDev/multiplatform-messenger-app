@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Text,
@@ -11,20 +11,17 @@ import {
   ArrowBackIcon,
   Icon,
 } from "native-base";
-import { ScrollView } from "react-native";
 import { ChatState } from "../Context/ChatProvider";
 import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
 import io from "socket.io-client";
 import { getSender, getSenderFull } from "../config/ChatLogics";
-import LottieView from "lottie-react-native";
-import animationData from "../animations/typing.json";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import ScrollableChat from "./ScrollableChat";
 
+// NOTE: Replace with your local IP if testing on a mobile device
 const ENDPOINT = "http://localhost:5000";
-let socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
@@ -37,6 +34,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const toast = useToast();
   const { selectedChat, setSelectedChat, user, notification, setNotification } =
     ChatState();
+
+  const selectedChatCompare = useRef();
+  const scrollViewRef = useRef();
+  const socketRef = useRef();
 
   const fetchMessages = async () => {
     if (!selectedChat) return;
@@ -56,7 +57,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       setMessages(data);
       setLoading(false);
 
-      socket.emit("join chat", selectedChat._id);
+      socketRef.current.emit("join chat", selectedChat._id);
 
       if (data.length === 0) {
         toast.show({
@@ -79,7 +80,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   const sendMessage = async () => {
     if (!newMessage) return;
-    socket.emit("stop typing", selectedChat._id);
+    socketRef.current.emit("stop typing", selectedChat._id);
 
     try {
       const config = {
@@ -88,7 +89,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      setNewMessage("");
       const { data } = await axios.post(
         `${ENDPOINT}/api/message`,
         {
@@ -98,11 +98,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         config
       );
 
-      socket.emit("new message", data);
-      setMessages([...messages, data]);
+      setNewMessage("");
+      socketRef.current.emit("new message", data);
+      setMessages((prev) => [...prev, data]);
     } catch (error) {
       toast.show({
-        title: "Error Occured!",
+        title: "Error Occurred!",
         description: "Failed to send the Message",
         status: "error",
         duration: 5000,
@@ -119,7 +120,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     if (!typing) {
       setTyping(true);
-      socket.emit("typing", selectedChat._id);
+      socketRef.current.emit("typing", selectedChat._id);
     }
 
     let lastTypingTime = new Date().getTime();
@@ -130,40 +131,54 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       const timeDiff = now - lastTypingTime;
 
       if (timeDiff >= timerLength && typing) {
-        socket.emit("stop typing", selectedChat._id);
+        socketRef.current.emit("stop typing", selectedChat._id);
         setTyping(false);
       }
     }, timerLength);
   };
 
   useEffect(() => {
-    socket = io(ENDPOINT);
+    if (!user || socketRef.current) return;
+
+    socketRef.current = io(ENDPOINT);
+    const socket = socketRef.current;
+
     socket.emit("setup", user);
     socket.on("connected", () => setSocketConnected(true));
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
-  }, []);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user]);
 
   useEffect(() => {
     fetchMessages();
-    selectedChatCompare = selectedChat;
+    selectedChatCompare.current = selectedChat;
   }, [selectedChat]);
 
   useEffect(() => {
+    const socket = socketRef.current;
+
     socket.on("message received", (newMessageReceived) => {
       if (
-        !selectedChatCompare ||
-        selectedChatCompare._id !== newMessageReceived.chat._id
+        !selectedChatCompare.current ||
+        selectedChatCompare.current._id !== newMessageReceived.chat._id
       ) {
         if (!notification.some((n) => n._id === newMessageReceived._id)) {
-          setNotification([newMessageReceived, ...notification]);
+          setNotification((prev) => [newMessageReceived, ...prev]);
           setFetchAgain((prev) => !prev);
         }
       } else {
         setMessages((prev) => [...prev, newMessageReceived]);
       }
     });
-  });
+
+    return () => {
+      socket.off("message received");
+    };
+  }, [notification, setFetchAgain, setNotification]);
 
   if (!selectedChat) {
     return (
@@ -217,18 +232,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               <Spinner size="lg" color="blue.500" />
             </Box>
           ) : (
-            <ScrollableChat messages={messages} />
+            <ScrollableChat
+              messages={messages}
+              istyping={istyping}
+              selectedChat={selectedChat}
+              scrollViewRef={scrollViewRef}
+            />
           )}
         </Box>
-
-        {istyping && (
-          <LottieView
-            source={animationData}
-            autoPlay
-            loop
-            style={{ width: 70, height: 70 }}
-          />
-        )}
 
         <HStack space={2} alignItems="center">
           <Input
@@ -239,10 +250,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             bg="white"
             borderRadius="full"
             flex={1}
-            onSubmitEditing={() => {
-              console.log("Sending message:", newMessage);
-              sendMessage();
-            }}
+            onSubmitEditing={sendMessage}
           />
           <IconButton
             icon={<MaterialIcons name="send" size={24} color="gray" />}

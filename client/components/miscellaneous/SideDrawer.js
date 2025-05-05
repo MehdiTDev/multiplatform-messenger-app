@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   HStack,
@@ -12,11 +12,9 @@ import {
   Input,
   Spinner,
   Divider,
-  Actionsheet,
+  Slide,
   useDisclose,
   Tooltip,
-  Portal,
-  Slide,
   useToast,
 } from "native-base";
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -26,21 +24,51 @@ import ProfileModal from "./ProfileModal";
 import ChatLoading from "../ChatLoading";
 import UserListItem from "../userAvatar/UserListItem";
 import axios from "axios";
+import io from "socket.io-client";
+
+const ENDPOINT = "http://localhost:5000"; // Change to your backend URL
+let socket;
 
 export default function SideDrawer() {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
+
   const { isOpen, onOpen, onClose } = useDisclose();
 
-  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
+  const {
+    selectedChat,
+    setSelectedChat,
+    user,
+    chats,
+    setChats,
+    notification,
+    setNotification,
+  } = ChatState();
 
   const toast = useToast();
 
+  useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit("setup", user);
+
+    socket.on("message received", (newMessageReceived) => {
+      if (!selectedChat || selectedChat._id !== newMessageReceived.chat._id) {
+        setNotification((prev) => {
+          if (prev.find((n) => n._id === newMessageReceived._id)) return prev;
+          return [newMessageReceived, ...prev];
+        });
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
-
     navigation.navigate("HomePage");
   };
 
@@ -53,7 +81,6 @@ export default function SideDrawer() {
         duration: 1000,
         placement: "top-left",
       });
-
       return;
     }
 
@@ -71,11 +98,10 @@ export default function SideDrawer() {
         config
       );
 
-      setLoading(false);
-
       setSearchResult(data);
+      setLoading(false);
     } catch (error) {
-      console.log("failed to find search results");
+      setLoading(false);
       toast.show({
         title: "Error searching",
         description: "Failed to find results",
@@ -87,8 +113,6 @@ export default function SideDrawer() {
   };
 
   const accessChat = async (userId) => {
-    console.log("the user has been clicked");
-
     try {
       setLoadingChat(true);
 
@@ -105,19 +129,15 @@ export default function SideDrawer() {
         config
       );
 
-      //      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]); // va behövs den till ? om chaten redan finns ?
-
       setSelectedChat(data);
       setLoadingChat(false);
-      console.log(selectedChat);
-      // when printing the selected chat it gives undefined the first time it is created.
       onClose();
     } catch (error) {
       setLoadingChat(false);
 
       toast.show({
-        title: "error",
-        description: "chat not found",
+        title: "Error",
+        description: "Chat not found",
         status: "error",
         duration: 1000,
         placement: "top-left",
@@ -129,7 +149,7 @@ export default function SideDrawer() {
     <>
       {/* Header */}
       <Box style={styles.header}>
-        {/* Search Button with Tooltip */}
+        {/* Search Button */}
         <Tooltip label="Search Users to chat" placement="bottom right">
           <Pressable onPress={onOpen}>
             <HStack alignItems="center" space={2}>
@@ -149,14 +169,36 @@ export default function SideDrawer() {
             trigger={(triggerProps) => (
               <Pressable {...triggerProps}>
                 <HStack alignItems="center">
-                  <Box style={styles.notificationDot} />
+                  {notification.length > 0 && (
+                    <Box style={styles.notificationDot} />
+                  )}
                   <Icon as={Ionicons} name="notifications" size="lg" />
                 </HStack>
               </Pressable>
             )}
           >
-            <Menu.Item>No New Messages</Menu.Item>
-            <Divider />
+            {notification.length === 0 ? (
+              <Menu.Item>No New Messages</Menu.Item>
+            ) : (
+              notification.map((notif) => (
+                <Menu.Item
+                  key={notif._id}
+                  onPress={() => {
+                    setSelectedChat(notif.chat);
+                    setNotification((prev) =>
+                      prev.filter((n) => n._id !== notif._id)
+                    );
+                  }}
+                >
+                  <Text fontWeight="bold">
+                    {notif.chat.isGroupChat
+                      ? `Group: ${notif.chat.chatName}`
+                      : `From: ${notif.sender.name}`}
+                  </Text>
+                  <Text numberOfLines={1}>{notif.content}</Text>
+                </Menu.Item>
+              ))
+            )}
           </Menu>
 
           {/* Profile Dropdown */}
@@ -186,12 +228,11 @@ export default function SideDrawer() {
         </HStack>
       </Box>
 
-      {/* ActionSheet */}
-
+      {/* Slide-out Drawer */}
       <Slide in={isOpen} placement="left" duration={300}>
         <Box w="300px" h="100%" bg="white" shadow={9} p="5" safeArea>
           <Text fontSize="xl" mb="4">
-            search users
+            Search users
           </Text>
 
           <HStack space={2} w="100%" px={4} mb={3}>
@@ -199,11 +240,9 @@ export default function SideDrawer() {
               h={10}
               placeholder="Search by name or email"
               value={search}
-              bg="red"
-              marginBottom={3}
+              bg="gray.100"
               onChangeText={(text) => setSearch(text)}
             />
-
             <Button h={10} onPress={searchHandler}>
               Go
             </Button>
@@ -241,14 +280,14 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 8,
     borderBottomWidth: 1,
-    borderColor: "#E2E8F0", // gray.200
+    borderColor: "#E2E8F0",
   },
   title: {
     fontSize: 20,
     fontFamily: "sans-serif-medium",
   },
   notificationDot: {
-    backgroundColor: "#EF4444", // red.500
+    backgroundColor: "#EF4444",
     borderRadius: 9999,
     width: 12,
     height: 12,
@@ -257,36 +296,4 @@ const styles = StyleSheet.create({
     right: -2,
     zIndex: 1,
   },
-  drawerHeader: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
 });
-
-/*
-
-<Actionsheet isOpen={isOpen} onClose={onClose}>
-        <Actionsheet.Content>
-          <Text style={styles.drawerHeader}>Search Users</Text>
-          <HStack space={2} w="100%" px={4} mb={3}>
-            <Input
-              flex={1}
-              placeholder="Search by name or email"
-              value={search}
-              onChangeText={(text) => setSearch(text)}
-            />
-            <Button>Go</Button>
-          </HStack>
-
-          <VStack w="100%" px={4}>
-            <Spinner />
-          </VStack>
-        </Actionsheet.Content>
-      </Actionsheet>
-
-
-
-
-
-*/

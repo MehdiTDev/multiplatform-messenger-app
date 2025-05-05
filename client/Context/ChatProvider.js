@@ -6,7 +6,8 @@ const ChatProvider = ({ children }) => {
   const [selectedChat, setSelectedChat] = useState();
   const [user, setUser] = useState();
   const [chats, setChats] = useState();
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [notification, setNotification] = useState([]); // ✅ New state for notifications
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = () => {
@@ -14,7 +15,7 @@ const ChatProvider = ({ children }) => {
       if (userInfo) {
         setUser(JSON.parse(userInfo));
       }
-      setLoading(false); // Set loading to false after user check
+      setLoading(false);
     };
 
     fetchUser();
@@ -29,6 +30,8 @@ const ChatProvider = ({ children }) => {
         setSelectedChat,
         chats,
         setChats,
+        notification, // ✅ Include in context
+        setNotification, // ✅ Include in context
         loading,
       }}
     >
@@ -37,8 +40,6 @@ const ChatProvider = ({ children }) => {
   );
 };
 
-export const ChatState = () => {
-  return useContext(ChatContext);
-};
+export const ChatState = () => useContext(ChatContext);
 
 export default ChatProvider;
