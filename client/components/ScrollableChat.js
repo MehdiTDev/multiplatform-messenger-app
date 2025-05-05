@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import { Box, Avatar, Text, Tooltip } from "native-base";
 import {
@@ -11,9 +11,18 @@ import { ChatState } from "../Context/ChatProvider";
 
 const ScrollableChat = ({ messages }) => {
   const { user } = ChatState();
+  const scrollViewRef = useRef(null);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  }, [messages]);
 
   return (
     <ScrollView
+      ref={scrollViewRef}
       style={styles.scrollContainer}
       contentContainerStyle={styles.contentContainer}
     >
