@@ -11,14 +11,11 @@ import {
   ArrowBackIcon,
   Icon,
 } from "native-base";
-import { ScrollView } from "react-native";
 import { ChatState } from "../Context/ChatProvider";
 import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
 import io from "socket.io-client";
 import { getSender, getSenderFull } from "../config/ChatLogics";
-import LottieView from "lottie-react-native";
-import animationData from "../animations/typing.json";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import ScrollableChat from "./ScrollableChat";
@@ -39,8 +36,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     ChatState();
 
   const selectedChatCompare = useRef();
-
-  // Ref to keep track of socket connection
+  const scrollViewRef = useRef();
   const socketRef = useRef();
 
   const fetchMessages = async () => {
@@ -146,6 +142,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     socketRef.current = io(ENDPOINT);
     const socket = socketRef.current;
+
     socket.emit("setup", user);
     socket.on("connected", () => setSocketConnected(true));
     socket.on("typing", () => setIsTyping(true));
@@ -162,7 +159,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   }, [selectedChat]);
 
   useEffect(() => {
-    socketRef.current.on("message received", (newMessageReceived) => {
+    const socket = socketRef.current;
+
+    socket.on("message received", (newMessageReceived) => {
       if (
         !selectedChatCompare.current ||
         selectedChatCompare.current._id !== newMessageReceived.chat._id
@@ -177,9 +176,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     });
 
     return () => {
-      socketRef.current.off("message received");
+      socket.off("message received");
     };
-  });
+  }, [notification, setFetchAgain, setNotification]);
 
   if (!selectedChat) {
     return (
@@ -233,18 +232,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               <Spinner size="lg" color="blue.500" />
             </Box>
           ) : (
-            <ScrollableChat messages={messages} />
+            <ScrollableChat
+              messages={messages}
+              istyping={istyping}
+              selectedChat={selectedChat}
+              scrollViewRef={scrollViewRef}
+            />
           )}
         </Box>
-
-        {istyping && (
-          <LottieView
-            source={animationData}
-            autoPlay
-            loop
-            style={{ width: 70, height: 70 }}
-          />
-        )}
 
         <HStack space={2} alignItems="center">
           <Input

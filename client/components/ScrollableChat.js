@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { ScrollView, StyleSheet } from "react-native";
-import { Box, Avatar, Text, Tooltip } from "native-base";
+import { Box, Avatar, Text, Tooltip, HStack } from "native-base";
 import {
   isLastMessage,
   isSameSender,
@@ -9,22 +9,25 @@ import {
 } from "../config/ChatLogics";
 import { ChatState } from "../Context/ChatProvider";
 
-const ScrollableChat = ({ messages }) => {
+const ScrollableChat = ({
+  messages,
+  istyping,
+  selectedChat,
+  scrollViewRef,
+}) => {
   const { user } = ChatState();
-  const scrollViewRef = useRef(null);
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
-    if (scrollViewRef.current) {
+    if (scrollViewRef?.current) {
       scrollViewRef.current.scrollToEnd({ animated: true });
     }
-  }, [messages]);
+  }, [messages, istyping]);
 
   return (
     <ScrollView
-      ref={scrollViewRef}
       style={styles.scrollContainer}
       contentContainerStyle={styles.contentContainer}
+      ref={scrollViewRef}
     >
       {messages &&
         messages.map((m, i) => {
@@ -72,6 +75,24 @@ const ScrollableChat = ({ messages }) => {
             </Box>
           );
         })}
+
+      {istyping && (
+        <Box flexDirection="row" alignItems="center" mt={1} px={2}>
+          <Avatar
+            size="sm"
+            name="typing"
+            source={{
+              uri: selectedChat.users.find((u) => u._id !== user._id)?.pic,
+            }}
+            mr={2}
+          />
+          <HStack space={1}>
+            <Box w={2} h={2} bg="gray.400" rounded="full" />
+            <Box w={2} h={2} bg="gray.400" rounded="full" />
+            <Box w={2} h={2} bg="gray.400" rounded="full" />
+          </HStack>
+        </Box>
+      )}
     </ScrollView>
   );
 };
