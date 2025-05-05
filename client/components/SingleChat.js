@@ -25,7 +25,6 @@ import ScrollableChat from "./ScrollableChat";
 
 // NOTE: Replace with your local IP if testing on a mobile device
 const ENDPOINT = "http://localhost:5000";
-let socket;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
@@ -40,6 +39,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     ChatState();
 
   const selectedChatCompare = useRef();
+
+  // Ref to keep track of socket connection
+  const socketRef = useRef();
 
   const fetchMessages = async () => {
     if (!selectedChat) return;
@@ -59,7 +61,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       setMessages(data);
       setLoading(false);
 
-      socket.emit("join chat", selectedChat._id);
+      socketRef.current.emit("join chat", selectedChat._id);
 
       if (data.length === 0) {
         toast.show({
@@ -82,7 +84,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   const sendMessage = async () => {
     if (!newMessage) return;
-    socket.emit("stop typing", selectedChat._id);
+    socketRef.current.emit("stop typing", selectedChat._id);
 
     try {
       const config = {
@@ -101,7 +103,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       );
 
       setNewMessage("");
-      socket.emit("new message", data);
+      socketRef.current.emit("new message", data);
       setMessages((prev) => [...prev, data]);
     } catch (error) {
       toast.show({
@@ -122,7 +124,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     if (!typing) {
       setTyping(true);
-      socket.emit("typing", selectedChat._id);
+      socketRef.current.emit("typing", selectedChat._id);
     }
 
     let lastTypingTime = new Date().getTime();
@@ -133,16 +135,17 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       const timeDiff = now - lastTypingTime;
 
       if (timeDiff >= timerLength && typing) {
-        socket.emit("stop typing", selectedChat._id);
+        socketRef.current.emit("stop typing", selectedChat._id);
         setTyping(false);
       }
     }, timerLength);
   };
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || socketRef.current) return;
 
-    socket = io(ENDPOINT);
+    socketRef.current = io(ENDPOINT);
+    const socket = socketRef.current;
     socket.emit("setup", user);
     socket.on("connected", () => setSocketConnected(true));
     socket.on("typing", () => setIsTyping(true));
@@ -159,7 +162,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   }, [selectedChat]);
 
   useEffect(() => {
-    socket.on("message received", (newMessageReceived) => {
+    socketRef.current.on("message received", (newMessageReceived) => {
       if (
         !selectedChatCompare.current ||
         selectedChatCompare.current._id !== newMessageReceived.chat._id
@@ -174,7 +177,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     });
 
     return () => {
-      socket.off("message received");
+      socketRef.current.off("message received");
     };
   });
 
