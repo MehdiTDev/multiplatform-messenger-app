@@ -13,7 +13,7 @@ export default function MyChats({ fetchAgain }) {
 
 
 
-  var storage = localStorage
+  var storage = AsyncStorage
 
   if (Platform.OS === 'web') {
     storage = localStorage

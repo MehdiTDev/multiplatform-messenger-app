@@ -17,7 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Signup({ navigation }) {
 
-  var storage = localStorage
+  var storage = AsyncStorage
 
   if (Platform.OS === 'web') {
     storage = localStorage

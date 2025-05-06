@@ -34,7 +34,7 @@ let socket;
 
 export default function SideDrawer() {
 
-  var storage = localStorage
+  var storage = AsyncStorage
 
   if (Platform.OS === 'web') {
     storage = localStorage

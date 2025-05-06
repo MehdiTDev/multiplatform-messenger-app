@@ -8,7 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function HomePage({ navigation }) {
   const [selectedTab, setSelectedTab] = useState("Login");
 
-  var storage = localStorage
+  var storage = AsyncStorage
 
   if (Platform.OS === 'web') {
     console.log('Running in a web browser');
