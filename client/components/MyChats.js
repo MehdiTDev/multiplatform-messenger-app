@@ -5,9 +5,24 @@ import ChatLoading from "./ChatLoading";
 import { getSender } from "../config/ChatLogics";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import axios from "axios";
-import { Pressable, Button } from "react-native";
+import { Pressable, Button, Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 export default function MyChats({ fetchAgain }) {
+
+
+
+  var storage = localStorage
+
+  if (Platform.OS === 'web') {
+    storage = localStorage
+  } else if (Platform.OS === 'ios') {
+    storage = AsyncStorage
+  } else if (Platform.OS === 'android') {
+    storage = AsyncStorage
+
+  }
   const [loggedUser, setLoggedUser] = useState();
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const toast = useToast();
@@ -38,7 +53,7 @@ export default function MyChats({ fetchAgain }) {
   };
 
   useEffect(() => {
-    setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
+    setLoggedUser(JSON.parse(storage.getItem("userInfo")));
     fetchChats();
   }, [fetchAgain]);
 

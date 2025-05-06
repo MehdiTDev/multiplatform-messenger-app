@@ -8,11 +8,25 @@ import {
   Pressable,
   useToast,
 } from "native-base";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import axios from "axios";
 import { ChatState } from "../../Context/ChatProvider";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login({ navigation }) {
+
+  var storage = localStorage
+
+  if (Platform.OS === 'web') {
+    storage = localStorage
+  } else if (Platform.OS === 'ios') {
+    storage = AsyncStorage
+  } else if (Platform.OS === 'android') {
+    storage = AsyncStorage
+
+  }
+
+
   const { setUser } = ChatState();
 
   const [email, setEmail] = useState("");
@@ -51,7 +65,7 @@ export default function Login({ navigation }) {
         config
       );
 
-      localStorage.setItem("userInfo", JSON.stringify(data));
+      storage.setItem("userInfo", JSON.stringify(data));
       setUser(data);
 
       toast.show({
