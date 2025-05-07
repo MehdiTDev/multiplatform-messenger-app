@@ -237,7 +237,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         </HStack>
       </HStack>
 
-      <Box flex={1} bg="#00BFFF" borderRadius="lg" p={2}>
+      <Box flex={1} borderRadius="lg" p={2}>
         <Box
           flex={1}
           bg="white"
@@ -262,25 +262,38 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         </Box>
 
         <HStack space={2} alignItems="center">
-          <Input
-            variant="filled"
-            placeholder="Type a message"
-            value={newMessage}
-            onChangeText={typingHandler}
-            bg="white"
-            borderRadius="full"
+          <Box
             flex={1}
-            onSubmitEditing={sendMessage}
-            _focus={{
-              bg: "#BEE3F8",
-              borderColor: "gray.300",
-            }}
-          />
+            borderWidth={2}
+            borderColor="#00BFFF"
+            borderRadius="full"
+            px={2}
+            py={1}
+            bg="white"
+          >
+            <Input
+              variant="unstyled"
+              placeholder="Type a message"
+              value={newMessage}
+              onChangeText={typingHandler}
+              borderRadius="full"
+              onSubmitEditing={sendMessage}
+              _focus={{
+                bg: "white",
+              }}
+            />
+          </Box>
           <IconButton
-            icon={<MaterialIcons name="send" size={24} color="gray" />}
+            icon={<MaterialIcons name="send" size={24} color="#A1DBF1" />}
             onPress={sendMessage}
             variant="ghost"
             size="sm"
+            _pressed={{
+              bg: "coolGray.100", // light background when pressed
+              icon: {
+                color: "#5CB8D9", // slightly darker blue on press
+              },
+            }}
           />
         </HStack>
       </Box>
