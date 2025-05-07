@@ -7,6 +7,9 @@ import GroupChatModal from "./miscellaneous/GroupChatModal";
 import axios from "axios";
 import { Pressable, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import io from "socket.io-client";
+
+const ENDPOINT = "http://localhost:5000"; // Your server endpoint
 
 export default function MyChats({ fetchAgain }) {
   var storage = AsyncStorage;
@@ -60,6 +63,79 @@ export default function MyChats({ fetchAgain }) {
 
     fetchChats();
   }, [fetchAgain]);
+
+  useEffect(() => {
+    if (!user) return; // If there's no user, skip socket connection setup.
+
+    const socket = io(ENDPOINT);
+
+    socket.emit("setup", user);
+    socket.on("connected", () => console.log("Socket Connected"));
+
+    // Listen for new messages
+    socket.on("message received", (newMessageReceived) => {
+      // Update chats state with the new message
+      setChats((prevChats) => {
+        const updatedChats = prevChats.map((chat) => {
+          if (chat._id === newMessageReceived.chat._id) {
+            return { ...chat, latestMessage: newMessageReceived }; // Update the chat with the new message
+          }
+          return chat;
+        });
+
+        // Return the updated chats array
+        return updatedChats;
+      });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user]);
+
+  // Function to update the chat list when sending a message
+  const sendMessageHandler = async (newMessage, selectedChat) => {
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const { data } = await axios.post(
+        "http://localhost:5000/api/message",
+        {
+          content: newMessage,
+          chatId: selectedChat._id,
+        },
+        config
+      );
+
+      // Manually update the chats list after sending a message
+      setChats((prevChats) => {
+        const updatedChats = prevChats.map((chat) => {
+          if (chat._id === selectedChat._id) {
+            return {
+              ...chat,
+              latestMessage: data, // Update the latest message in the selected chat
+            };
+          }
+          return chat;
+        });
+        return updatedChats;
+      });
+    } catch (error) {
+      toast({
+        title: "Error Occurred!",
+        description: "Failed to send the message",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        placement: "bottom",
+      });
+    }
+  };
 
   const setTheChat = (theChat) => {
     setSelectedChat(theChat);
