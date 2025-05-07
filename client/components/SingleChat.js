@@ -32,8 +32,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [istyping, setIsTyping] = useState(false);
 
   const toast = useToast();
-  const { selectedChat, setSelectedChat, user, notification, setNotification } =
-    ChatState();
+  const {
+    selectedChat,
+    setSelectedChat,
+    user,
+    notification,
+    setNotification,
+    chats,
+    setChats,
+  } = ChatState();
 
   const selectedChatCompare = useRef();
   const scrollViewRef = useRef();
@@ -101,6 +108,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       setNewMessage("");
       socketRef.current.emit("new message", data);
       setMessages((prev) => [...prev, data]);
+
+      // Update the chats state with the latest message
+      setChats((prevChats) => {
+        return prevChats.map((chat) => {
+          if (chat._id === selectedChat._id) {
+            return {
+              ...chat,
+              latestMessage: data, // Update the latest message
+            };
+          }
+          return chat;
+        });
+      });
     } catch (error) {
       toast.show({
         title: "Error Occurred!",
@@ -255,7 +275,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               bg: "#BEE3F8",
               borderColor: "gray.300",
             }}
-
           />
           <IconButton
             icon={<MaterialIcons name="send" size={24} color="gray" />}

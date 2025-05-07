@@ -93,50 +93,6 @@ export default function MyChats({ fetchAgain }) {
     };
   }, [user]);
 
-  // Function to update the chat list when sending a message
-  const sendMessageHandler = async (newMessage, selectedChat) => {
-    try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-
-      const { data } = await axios.post(
-        "http://localhost:5000/api/message",
-        {
-          content: newMessage,
-          chatId: selectedChat._id,
-        },
-        config
-      );
-
-      // Manually update the chats list after sending a message
-      setChats((prevChats) => {
-        const updatedChats = prevChats.map((chat) => {
-          if (chat._id === selectedChat._id) {
-            return {
-              ...chat,
-              latestMessage: data, // Update the latest message in the selected chat
-            };
-          }
-          return chat;
-        });
-        return updatedChats;
-      });
-    } catch (error) {
-      toast({
-        title: "Error Occurred!",
-        description: "Failed to send the message",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        placement: "bottom",
-      });
-    }
-  };
-
   const setTheChat = (theChat) => {
     setSelectedChat(theChat);
   };
@@ -207,7 +163,9 @@ export default function MyChats({ fetchAgain }) {
                   {chat.latestMessage && (
                     <Text fontSize="xs" color="gray.700" isTruncated>
                       <Text fontWeight="bold">
-                        {chat.latestMessage.sender?.name}:{" "}
+                        {chat.latestMessage.sender?._id === user._id
+                          ? "You: "
+                          : `${chat.latestMessage.sender?.name}: `}
                       </Text>
                       {chat.latestMessage.content.length > 50
                         ? chat.latestMessage.content.substring(0, 51) + "..."
