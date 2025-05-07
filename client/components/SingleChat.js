@@ -284,7 +284,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             />
           </Box>
           <IconButton
-            icon={<MaterialIcons name="send" size={24} color="#A1DBF1" />}
+            icon={<MaterialIcons name="send" size={24} color="#00BFFF" />}
             onPress={sendMessage}
             variant="ghost"
             size="sm"
