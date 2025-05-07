@@ -5,24 +5,21 @@ import ChatLoading from "./ChatLoading";
 import { getSender } from "../config/ChatLogics";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import axios from "axios";
-import { Pressable, Button, Platform } from "react-native";
+import { Pressable, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import io from "socket.io-client";
 
+const ENDPOINT = "http://localhost:5000"; // Your server endpoint
 
 export default function MyChats({ fetchAgain }) {
+  var storage = AsyncStorage;
 
-
-
-  var storage = AsyncStorage
-
-  if (Platform.OS === 'web') {
-    storage = localStorage
-  } else if (Platform.OS === 'ios') {
-    storage = AsyncStorage
-  } else if (Platform.OS === 'android') {
-    storage = AsyncStorage
-
+  if (Platform.OS === "web") {
+    storage = localStorage;
+  } else {
+    storage = AsyncStorage;
   }
+
   const [loggedUser, setLoggedUser] = useState();
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const toast = useToast();
@@ -53,9 +50,6 @@ export default function MyChats({ fetchAgain }) {
   };
 
   useEffect(() => {
-
-
-
     const userInfo = storage.getItem("userInfo");
 
     if (typeof userInfo === "string") {
@@ -66,17 +60,43 @@ export default function MyChats({ fetchAgain }) {
         console.error("Failed to parse userInfo:", error);
       }
     }
-    //setLoggedUser(JSON.parse(storage.getItem("userInfo")));
+
     fetchChats();
   }, [fetchAgain]);
 
+  useEffect(() => {
+    if (!user) return; // If there's no user, skip socket connection setup.
+
+    const socket = io(ENDPOINT);
+
+    socket.emit("setup", user);
+    socket.on("connected", () => console.log("Socket Connected"));
+
+    // Listen for new messages
+    socket.on("message received", (newMessageReceived) => {
+      // Update chats state with the new message
+      setChats((prevChats) => {
+        const updatedChats = prevChats.map((chat) => {
+          if (chat._id === newMessageReceived.chat._id) {
+            return { ...chat, latestMessage: newMessageReceived }; // Update the chat with the new message
+          }
+          return chat;
+        });
+
+        // Return the updated chats array
+        return updatedChats;
+      });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user]);
 
   const setTheChat = (theChat) => {
+    setSelectedChat(theChat);
+  };
 
-    setSelectedChat(theChat)
-    return;
-
-  }
   return (
     <Box
       flexDir="column"
@@ -127,15 +147,7 @@ export default function MyChats({ fetchAgain }) {
         {chats ? (
           <Stack space={3}>
             {chats.map((chat) => (
-              <Pressable key={chat._id} onPress={() => {
-
-
-                setTheChat(chat)
-                //console.log(selectedChat)
-
-
-
-              }}>
+              <Pressable key={chat._id} onPress={() => setTheChat(chat)}>
                 <Box
                   bg={selectedChat === chat ? "#00BFFF" : "#A1DBF1"}
                   color={selectedChat === chat ? "white" : "black"}
@@ -143,14 +155,18 @@ export default function MyChats({ fetchAgain }) {
                   py={2}
                   borderRadius="lg"
                 >
-                  <Text>
+                  <Text fontWeight="bold">
                     {!chat.isGroupChat
                       ? getSender(loggedUser, chat.users)
                       : chat.chatName}
                   </Text>
                   {chat.latestMessage && (
-                    <Text fontSize="xs">
-                      <b>{chat.latestMessage.sender.name} : </b>
+                    <Text fontSize="xs" color="gray.700" isTruncated>
+                      <Text fontWeight="bold">
+                        {chat.latestMessage.sender?._id === user._id
+                          ? "You: "
+                          : `${chat.latestMessage.sender?.name}: `}
+                      </Text>
                       {chat.latestMessage.content.length > 50
                         ? chat.latestMessage.content.substring(0, 51) + "..."
                         : chat.latestMessage.content}
@@ -167,4 +183,3 @@ export default function MyChats({ fetchAgain }) {
     </Box>
   );
 }
-
