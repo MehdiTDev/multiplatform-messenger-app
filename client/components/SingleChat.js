@@ -251,6 +251,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             borderRadius="full"
             flex={1}
             onSubmitEditing={sendMessage}
+            _focus={{
+              bg: "#BEE3F8",
+              borderColor: "gray.300",
+            }}
+
           />
           <IconButton
             icon={<MaterialIcons name="send" size={24} color="gray" />}

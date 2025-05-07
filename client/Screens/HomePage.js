@@ -1,14 +1,47 @@
 import { NativeBaseProvider, Box, HStack, Pressable, Text } from "native-base";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { useEffect, useState } from "react";
 import Login from "../components/Authentication/Login";
 import Signup from "../components/Authentication/Signup";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function HomePage({ navigation }) {
   const [selectedTab, setSelectedTab] = useState("Login");
 
+  var storage = AsyncStorage
+
+  if (Platform.OS === 'web') {
+    console.log('Running in a web browser');
+    storage = localStorage
+  } else if (Platform.OS === 'ios') {
+    console.log('Running on iOS');
+    storage = AsyncStorage
+  } else if (Platform.OS === 'android') {
+    console.log('Running on Android');
+    storage = AsyncStorage
+
+  }
+
+  console.log("this is the storage", storage)
+
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("userInfo"));
+
+    let user;
+    const userInfo = storage.getItem("userInfo");
+
+    if (typeof userInfo === "string") {
+      try {
+        const parsedUser = JSON.parse(userInfo);
+
+        user = parsedUser
+
+      } catch (error) {
+        console.error("Failed to parse userInfo:", error);
+      }
+    }
+
+
+    // const user = JSON.parse(storage.getItem("userInfo"));
     if (user) {
       navigation.navigate("ChatPage");
     }

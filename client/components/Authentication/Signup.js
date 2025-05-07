@@ -8,12 +8,28 @@ import {
   Pressable,
   useToast,
 } from "native-base";
-import { StyleSheet, Image } from "react-native";
+import { StyleSheet, Image, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { ChatState } from "../../Context/ChatProvider";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 export default function Signup({ navigation }) {
+
+  var storage = AsyncStorage
+
+  if (Platform.OS === 'web') {
+    storage = localStorage
+  } else if (Platform.OS === 'ios') {
+    storage = AsyncStorage
+  } else if (Platform.OS === 'android') {
+    storage = AsyncStorage
+
+  }
+
+
+
   const { setUser } = ChatState();
 
   const [name, setName] = useState("");
@@ -160,7 +176,7 @@ export default function Signup({ navigation }) {
         config
       );
 
-      localStorage.setItem("userInfo", JSON.stringify(data));
+      storage.setItem("userInfo", JSON.stringify(data));
 
       setUser(data);
 

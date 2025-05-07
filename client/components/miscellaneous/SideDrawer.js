@@ -19,18 +19,35 @@ import {
   Stack,
 } from "native-base";
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { ChatState } from "../../Context/ChatProvider";
 import ProfileModal from "./ProfileModal";
 import ChatLoading from "../ChatLoading";
 import UserListItem from "../userAvatar/UserListItem";
 import axios from "axios";
 import io from "socket.io-client";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 const ENDPOINT = "http://localhost:5000"; // Change to your backend URL
 let socket;
 
 export default function SideDrawer() {
+
+  var storage = AsyncStorage
+
+  if (Platform.OS === 'web') {
+    storage = localStorage
+  } else if (Platform.OS === 'ios') {
+    storage = AsyncStorage
+  } else if (Platform.OS === 'android') {
+    storage = AsyncStorage
+
+  }
+
+
+
+
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -69,7 +86,7 @@ export default function SideDrawer() {
   }, []);
 
   const logoutHandler = () => {
-    localStorage.removeItem("userInfo");
+    storage.removeItem("userInfo");
     navigation.navigate("HomePage");
   };
 
