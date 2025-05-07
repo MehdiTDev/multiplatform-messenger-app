@@ -31,8 +31,14 @@ const ChatProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = () => {
       const userInfo = storage.getItem("userInfo");
-      if (userInfo) {
-        setUser(JSON.parse(userInfo));
+
+      if (typeof userInfo === "string") {
+        try {
+          const parsedUser = JSON.parse(userInfo);
+          setUser(parsedUser);
+        } catch (error) {
+          console.error("Failed to parse userInfo:", error);
+        }
       }
       setLoading(false);
     };

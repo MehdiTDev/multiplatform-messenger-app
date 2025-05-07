@@ -53,7 +53,20 @@ export default function MyChats({ fetchAgain }) {
   };
 
   useEffect(() => {
-    setLoggedUser(JSON.parse(storage.getItem("userInfo")));
+
+
+
+    const userInfo = storage.getItem("userInfo");
+
+    if (typeof userInfo === "string") {
+      try {
+        const parsedUser = JSON.parse(userInfo);
+        setLoggedUser(parsedUser);
+      } catch (error) {
+        console.error("Failed to parse userInfo:", error);
+      }
+    }
+    //setLoggedUser(JSON.parse(storage.getItem("userInfo")));
     fetchChats();
   }, [fetchAgain]);
 

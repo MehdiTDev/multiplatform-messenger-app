@@ -25,7 +25,23 @@ export default function HomePage({ navigation }) {
   console.log("this is the storage", storage)
 
   useEffect(() => {
-    const user = JSON.parse(storage.getItem("userInfo"));
+
+    let user;
+    const userInfo = storage.getItem("userInfo");
+
+    if (typeof userInfo === "string") {
+      try {
+        const parsedUser = JSON.parse(userInfo);
+
+        user = parsedUser
+
+      } catch (error) {
+        console.error("Failed to parse userInfo:", error);
+      }
+    }
+
+
+    // const user = JSON.parse(storage.getItem("userInfo"));
     if (user) {
       navigation.navigate("ChatPage");
     }
