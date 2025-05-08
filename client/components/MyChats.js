@@ -8,8 +8,7 @@ import axios from "axios";
 import { Pressable, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import io from "socket.io-client";
-
-const ENDPOINT = "http://localhost:5000"; // Your server endpoint
+import { getENDPOINT } from "../config/ChatLogics";
 
 export default function MyChats({ fetchAgain }) {
   var storage = AsyncStorage;
@@ -20,6 +19,7 @@ export default function MyChats({ fetchAgain }) {
     storage = AsyncStorage;
   }
 
+  const ENDPOINT = getENDPOINT(Platform)
   const [loggedUser, setLoggedUser] = useState();
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const toast = useToast();
@@ -33,7 +33,7 @@ export default function MyChats({ fetchAgain }) {
       };
 
       const { data } = await axios.get(
-        "http://localhost:5000/api/chat",
+        `${ENDPOINT}/api/chat`,
         config
       );
       setChats(data);
@@ -66,6 +66,8 @@ export default function MyChats({ fetchAgain }) {
 
   useEffect(() => {
     if (!user) return; // If there's no user, skip socket connection setup.
+
+    const ENDPOINT = getENDPOINT(Platform)
 
     const socket = io(ENDPOINT);
 

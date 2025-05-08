@@ -12,6 +12,8 @@ import { StyleSheet, Platform } from "react-native";
 import axios from "axios";
 import { ChatState } from "../../Context/ChatProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getENDPOINT } from "../../config/ChatLogics";
+
 
 export default function Login({ navigation }) {
 
@@ -26,7 +28,6 @@ export default function Login({ navigation }) {
 
   }
 
-
   const { setUser } = ChatState();
 
   const [email, setEmail] = useState("");
@@ -35,6 +36,7 @@ export default function Login({ navigation }) {
   const [loading, setLoading] = useState(false);
 
   const toast = useToast();
+  const ENDPOINT = getENDPOINT(Platform)
 
   const submitHandler = async () => {
     setLoading(true);
@@ -60,7 +62,7 @@ export default function Login({ navigation }) {
       };
 
       const { data } = await axios.post(
-        "http://localhost:5000/api/user/login",
+        `${ENDPOINT}/api/user/login`,
         { email, password },
         config
       );

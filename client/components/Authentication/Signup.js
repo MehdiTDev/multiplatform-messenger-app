@@ -13,7 +13,7 @@ import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { ChatState } from "../../Context/ChatProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { getENDPOINT } from "../../config/ChatLogics";
 
 export default function Signup({ navigation }) {
 
@@ -29,6 +29,8 @@ export default function Signup({ navigation }) {
   }
 
 
+
+  const ENDPOINT = getENDPOINT(Platform)
 
   const { setUser } = ChatState();
 
@@ -171,7 +173,7 @@ export default function Signup({ navigation }) {
       };
 
       const { data } = await axios.post(
-        "http://localhost:5000/api/user",
+        `${ENDPOINT}/api/user`,
         { name, email, password, pic },
         config
       );
