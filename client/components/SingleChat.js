@@ -11,6 +11,7 @@ import {
   ArrowBackIcon,
   Icon,
 } from "native-base";
+import { Platform } from "react-native";
 import { ChatState } from "../Context/ChatProvider";
 import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
@@ -19,9 +20,11 @@ import { getSender, getSenderFull } from "../config/ChatLogics";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import ScrollableChat from "./ScrollableChat";
+import { getENDPOINT } from "../config/ChatLogics";
 
 // NOTE: Replace with your local IP if testing on a mobile device
-const ENDPOINT = "http://localhost:5000";
+
+
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
@@ -38,6 +41,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const selectedChatCompare = useRef();
   const scrollViewRef = useRef();
   const socketRef = useRef();
+  const ENDPOINT = getENDPOINT(Platform)
+
 
   const fetchMessages = async () => {
     if (!selectedChat) return;
@@ -139,6 +144,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   useEffect(() => {
     if (!user || socketRef.current) return;
+
+    const ENDPOINT = getENDPOINT(Platform)
 
     socketRef.current = io(ENDPOINT);
     const socket = socketRef.current;

@@ -13,6 +13,8 @@ import axios from "axios";
 import { ChatState } from "../../Context/ChatProvider";
 import UserBadgeItem from "../userAvatar/UserBadgeItem";
 import UserListItem from "../userAvatar/UserListItem";
+import { getENDPOINT } from "../../config/ChatLogics";
+import { Platform } from "react-native";
 
 export default function GroupChatModal({ children }) {
     const { isOpen, onOpen, onClose } = useDisclose();
@@ -24,6 +26,8 @@ export default function GroupChatModal({ children }) {
     const toast = useToast();
 
     const { user, chats, setChats } = ChatState();
+    const ENDPOINT = getENDPOINT(Platform)
+
 
     const handleGroup = (userToAdd) => {
         if (selectedUsers.includes(userToAdd)) {
@@ -53,7 +57,7 @@ export default function GroupChatModal({ children }) {
                 },
             };
             const { data } = await axios.get(
-                `http://localhost:5000/api/user?search=${query}`,
+                `${ENDPOINT}/api/user?search=${query}`,
                 config
             );
             setLoading(false);
@@ -99,7 +103,7 @@ export default function GroupChatModal({ children }) {
                 },
             };
             const { data } = await axios.post(
-                `http://localhost:5000/api/chat/group`,
+                `${ENDPOINT}/api/chat/group`,
                 {
                     name: groupChatName,
                     users: JSON.stringify(selectedUsers.map((u) => u._id)),

@@ -45,3 +45,17 @@ export const getSender = (loggedUser, users) => {
 export const getSenderFull = (loggedUser, users) => {
     return users[0]._id === loggedUser._id ? users[1] : users[0];
 };
+
+export const getENDPOINT = (platform) => {
+    let ENDPOINT;
+
+    if (platform.OS === 'web') {
+
+        ENDPOINT = "http://localhost:5000";
+
+    } else {
+
+        ENDPOINT = process.env.EXPO_PUBLIC_API_URL
+    }
+    return ENDPOINT
+}

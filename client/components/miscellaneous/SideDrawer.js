@@ -27,9 +27,8 @@ import UserListItem from "../userAvatar/UserListItem";
 import axios from "axios";
 import io from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getENDPOINT } from "../../config/ChatLogics";
 
-
-const ENDPOINT = "http://localhost:5000"; // Change to your backend URL
 let socket;
 
 export default function SideDrawer() {
@@ -48,6 +47,7 @@ export default function SideDrawer() {
 
 
 
+  const ENDPOINT = getENDPOINT(Platform)
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -68,6 +68,7 @@ export default function SideDrawer() {
   const toast = useToast();
 
   useEffect(() => {
+    const ENDPOINT = getENDPOINT(Platform)
     socket = io(ENDPOINT);
     socket.emit("setup", user);
 
@@ -105,7 +106,7 @@ export default function SideDrawer() {
       };
 
       const { data } = await axios.get(
-        `http://localhost:5000/api/user?search=${query}`,
+        `${ENDPOINT}/api/user?search=${query}`,
         config
       );
 
@@ -135,7 +136,7 @@ export default function SideDrawer() {
       };
 
       const { data } = await axios.post(
-        `http://localhost:5000/api/chat`,
+        `${ENDPOINT}/api/chat`,
         { userId },
         config
       );

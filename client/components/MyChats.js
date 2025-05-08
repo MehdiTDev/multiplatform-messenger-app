@@ -7,7 +7,7 @@ import GroupChatModal from "./miscellaneous/GroupChatModal";
 import axios from "axios";
 import { Pressable, Button, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { getENDPOINT } from "../config/ChatLogics";
 
 export default function MyChats({ fetchAgain }) {
 
@@ -23,6 +23,8 @@ export default function MyChats({ fetchAgain }) {
     storage = AsyncStorage
 
   }
+
+  const ENDPOINT = getENDPOINT(Platform)
   const [loggedUser, setLoggedUser] = useState();
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const toast = useToast();
@@ -36,7 +38,7 @@ export default function MyChats({ fetchAgain }) {
       };
 
       const { data } = await axios.get(
-        "http://localhost:5000/api/chat",
+        `${ENDPOINT}/api/chat`,
         config
       );
       setChats(data);

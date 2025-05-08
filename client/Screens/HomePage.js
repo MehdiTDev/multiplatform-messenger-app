@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import Login from "../components/Authentication/Login";
 import Signup from "../components/Authentication/Signup";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getENDPOINT } from "../config/ChatLogics";
+
 
 export default function HomePage({ navigation }) {
   const [selectedTab, setSelectedTab] = useState("Login");
@@ -25,6 +27,9 @@ export default function HomePage({ navigation }) {
     console.log("Running on Android");
     storage = AsyncStorage;
   }
+
+  console.log("the endPoint in Home page is the following", getENDPOINT(Platform));
+  // EndPoint is not needed here. This is just for testing. 
 
   useEffect(() => {
     const checkUserInfo = async () => {
@@ -46,6 +51,12 @@ export default function HomePage({ navigation }) {
     };
 
     checkUserInfo();
+
+    // this code below works just fine. 
+    //const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+    //console.log("This should be the .env code: ", apiUrl);
+
+
   }, [navigation]);
 
   return (
