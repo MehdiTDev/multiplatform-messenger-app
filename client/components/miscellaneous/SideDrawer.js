@@ -28,25 +28,19 @@ import axios from "axios";
 import io from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 const ENDPOINT = "http://localhost:5000"; // Change to your backend URL
 let socket;
 
 export default function SideDrawer() {
+  var storage = AsyncStorage;
 
-  var storage = AsyncStorage
-
-  if (Platform.OS === 'web') {
-    storage = localStorage
-  } else if (Platform.OS === 'ios') {
-    storage = AsyncStorage
-  } else if (Platform.OS === 'android') {
-    storage = AsyncStorage
-
+  if (Platform.OS === "web") {
+    storage = localStorage;
+  } else if (Platform.OS === "ios") {
+    storage = AsyncStorage;
+  } else if (Platform.OS === "android") {
+    storage = AsyncStorage;
   }
-
-
-
 
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
@@ -241,7 +235,6 @@ export default function SideDrawer() {
 
       {/* Slide-out Drawer */}
 
-
       {isOpen && (
         <Pressable
           onPress={onClose}
@@ -255,48 +248,50 @@ export default function SideDrawer() {
         />
       )}
 
-
-
-
-
       <Slide in={isOpen} placement="left" duration={300}>
-        <Box w="300px" h="100%" bg="white" shadow={9} p="5" safeArea zIndex={10} >
-          <Text fontSize="xl" mb="4">
-            Search users
-          </Text>
+        <Box
+          w="300px"
+          h="100%"
+          bg="white"
+          shadow={9}
+          p="5"
+          safeArea
+          zIndex={10}
+        >
+          <VStack w="100%" alignItems="center" space={3}>
+            <Text fontSize="xl" mb="4" textAlign="center">
+              Search users
+            </Text>
 
-          <HStack space={2} w="100%" px={4} mb={3}>
-            <Input
-              h={10}
-              placeholder="Search by name or email"
-              bg="gray.100"
-              onChangeText={searchHandler}
-            />
+            {/* Updated HStack with input padding */}
+            <HStack space={2} w="100%" px="3px" mb={3}>
+              <Input
+                h={10}
+                placeholder="Search by name or email"
+                bg="gray.100"
+                onChangeText={searchHandler}
+                w="100%"
+              />
+            </HStack>
 
-          </HStack>
+            <Box maxHeight="80%" w="100%" overflowY="auto">
+              <Stack alignItems="center">
+                {loading ? (
+                  <ChatLoading />
+                ) : (
+                  searchResult?.map((user) => (
+                    <UserListItem
+                      key={user._id}
+                      user={user}
+                      handleFunction={() => accessChat(user._id)}
+                    />
+                  ))
+                )}
+              </Stack>
+            </Box>
 
-
-          <Box maxHeight="80%" overflowY="auto">
-            <Stack>
-
-              {loading ? (
-                <ChatLoading />
-              ) : (
-
-                searchResult?.map((user) => (
-                  <UserListItem
-                    key={user._id}
-                    user={user}
-                    handleFunction={() => accessChat(user._id)}
-                  />
-                ))
-
-              )}
-            </Stack>
-          </Box>
-
-          {loadingChat && <Spinner ml="auto" d="flex" />}
-
+            {loadingChat && <Spinner ml="auto" />}
+          </VStack>
         </Box>
       </Slide>
     </>
