@@ -165,13 +165,42 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     socket.emit("setup", user);
     socket.on("connected", () => setSocketConnected(true));
-    socket.on("typing", () => setIsTyping(true));
-    socket.on("stop typing", () => setIsTyping(false));
 
     return () => {
       socket.disconnect();
     };
   }, [user]);
+
+  useEffect(() => {
+    const socket = socketRef.current;
+    if (!socket) return;
+
+    const handleTyping = (roomId) => {
+      if (
+        selectedChatCompare.current &&
+        selectedChatCompare.current._id === roomId
+      ) {
+        setIsTyping(true);
+      }
+    };
+
+    const handleStopTyping = (roomId) => {
+      if (
+        selectedChatCompare.current &&
+        selectedChatCompare.current._id === roomId
+      ) {
+        setIsTyping(false);
+      }
+    };
+
+    socket.on("typing", handleTyping);
+    socket.on("stop typing", handleStopTyping);
+
+    return () => {
+      socket.off("typing", handleTyping);
+      socket.off("stop typing", handleStopTyping);
+    };
+  }, []);
 
   useEffect(() => {
     fetchMessages();
