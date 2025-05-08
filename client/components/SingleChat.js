@@ -35,8 +35,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [istyping, setIsTyping] = useState(false);
 
   const toast = useToast();
-  const { selectedChat, setSelectedChat, user, notification, setNotification } =
-    ChatState();
+  const {
+    selectedChat,
+    setSelectedChat,
+    user,
+    notification,
+    setNotification,
+    chats,
+    setChats,
+  } = ChatState();
 
   const selectedChatCompare = useRef();
   const scrollViewRef = useRef();
@@ -106,6 +113,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       setNewMessage("");
       socketRef.current.emit("new message", data);
       setMessages((prev) => [...prev, data]);
+
+      // Update the chats state with the latest message
+      setChats((prevChats) => {
+        return prevChats.map((chat) => {
+          if (chat._id === selectedChat._id) {
+            return {
+              ...chat,
+              latestMessage: data, // Update the latest message
+            };
+          }
+          return chat;
+        });
+      });
     } catch (error) {
       toast.show({
         title: "Error Occurred!",
@@ -197,38 +217,41 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   return (
     <VStack flex={1} px={3} py={2} space={2}>
-      <HStack alignItems="center" justifyContent="space-between" width="100%">
-        <IconButton
-          icon={<ArrowBackIcon />}
-          onPress={() => setSelectedChat(null)}
-          display={{ base: "flex", md: "none" }}
-        />
-
-        <HStack flex={1} alignItems="center" justifyContent="space-between">
-          <Text fontSize="xl" fontWeight="bold">
-            {!selectedChat.isGroupChat
-              ? getSender(user, selectedChat.users)
-              : selectedChat.chatName.toUpperCase()}
-          </Text>
-          {!selectedChat.isGroupChat ? (
-            <ProfileModal user={getSenderFull(user, selectedChat.users)}>
-              <Icon as={MaterialIcons} name="visibility" size={6} />
-            </ProfileModal>
-          ) : (
-            <UpdateGroupChatModal
-              fetchAgain={fetchAgain}
-              setFetchAgain={setFetchAgain}
-              fetchMessages={fetchMessages}
-            />
-          )}
+      <Box px={3}>
+        <HStack alignItems="center" justifyContent="space-between" width="100%">
+          <IconButton
+            icon={<ArrowBackIcon />}
+            onPress={() => setSelectedChat(null)}
+            display={{ base: "flex", md: "none" }}
+          />
+          <HStack flex={1} alignItems="center" justifyContent="space-between">
+            <Text fontSize="xl" fontWeight="bold">
+              {!selectedChat.isGroupChat
+                ? getSender(user, selectedChat.users)
+                : selectedChat.chatName.toUpperCase()}
+            </Text>
+            {!selectedChat.isGroupChat ? (
+              <ProfileModal user={getSenderFull(user, selectedChat.users)}>
+                <Icon as={MaterialIcons} name="visibility" size={6} />
+              </ProfileModal>
+            ) : (
+              <UpdateGroupChatModal
+                fetchAgain={fetchAgain}
+                setFetchAgain={setFetchAgain}
+                fetchMessages={fetchMessages}
+              />
+            )}
+          </HStack>
         </HStack>
-      </HStack>
+      </Box>
 
-      <Box flex={1} bg="#00BFFF" borderRadius="lg" p={2}>
+      <Box flex={1} borderRadius="lg" p={2}>
         <Box
           flex={1}
           bg="white"
           borderRadius="lg"
+          borderWidth={2}
+          borderColor="#00BFFF"
           px={3}
           py={2}
           mb={2}
@@ -249,26 +272,38 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         </Box>
 
         <HStack space={2} alignItems="center">
-          <Input
-            variant="filled"
-            placeholder="Type a message"
-            value={newMessage}
-            onChangeText={typingHandler}
-            bg="white"
-            borderRadius="full"
+          <Box
             flex={1}
-            onSubmitEditing={sendMessage}
-            _focus={{
-              bg: "#BEE3F8",
-              borderColor: "gray.300",
-            }}
-
-          />
+            borderWidth={2}
+            borderColor="#00BFFF"
+            borderRadius="full"
+            px={2}
+            py={1}
+            bg="white"
+          >
+            <Input
+              variant="unstyled"
+              placeholder="Type a message"
+              value={newMessage}
+              onChangeText={typingHandler}
+              borderRadius="full"
+              onSubmitEditing={sendMessage}
+              _focus={{
+                bg: "white",
+              }}
+            />
+          </Box>
           <IconButton
-            icon={<MaterialIcons name="send" size={24} color="gray" />}
+            icon={<MaterialIcons name="send" size={24} color="#00BFFF" />}
             onPress={sendMessage}
             variant="ghost"
             size="sm"
+            _pressed={{
+              bg: "coolGray.100", // light background when pressed
+              icon: {
+                color: "#5CB8D9", // slightly darker blue on press
+              },
+            }}
           />
         </HStack>
       </Box>
