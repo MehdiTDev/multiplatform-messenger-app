@@ -8,7 +8,7 @@ import {
   Pressable,
   useToast,
 } from "native-base";
-import { StyleSheet, Platform } from "react-native";
+import { StyleSheet, Platform, View } from "react-native";
 import axios from "axios";
 import { ChatState } from "../../Context/ChatProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -102,6 +102,7 @@ export default function Login({ navigation }) {
           placeholder="Enter Your Email Address"
           value={email}
           onChangeText={setEmail}
+          autoCapitalize="none"
         />
       </Box>
 
@@ -134,7 +135,10 @@ export default function Login({ navigation }) {
       </Button>
     </VStack>
   );
+
+
 }
+
 
 // 🧹 All styles here
 const styles = StyleSheet.create({
