@@ -210,38 +210,41 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   return (
     <VStack flex={1} px={3} py={2} space={2}>
-      <HStack alignItems="center" justifyContent="space-between" width="100%">
-        <IconButton
-          icon={<ArrowBackIcon />}
-          onPress={() => setSelectedChat(null)}
-          display={{ base: "flex", md: "none" }}
-        />
-
-        <HStack flex={1} alignItems="center" justifyContent="space-between">
-          <Text fontSize="xl" fontWeight="bold">
-            {!selectedChat.isGroupChat
-              ? getSender(user, selectedChat.users)
-              : selectedChat.chatName.toUpperCase()}
-          </Text>
-          {!selectedChat.isGroupChat ? (
-            <ProfileModal user={getSenderFull(user, selectedChat.users)}>
-              <Icon as={MaterialIcons} name="visibility" size={6} />
-            </ProfileModal>
-          ) : (
-            <UpdateGroupChatModal
-              fetchAgain={fetchAgain}
-              setFetchAgain={setFetchAgain}
-              fetchMessages={fetchMessages}
-            />
-          )}
+      <Box px={3}>
+        <HStack alignItems="center" justifyContent="space-between" width="100%">
+          <IconButton
+            icon={<ArrowBackIcon />}
+            onPress={() => setSelectedChat(null)}
+            display={{ base: "flex", md: "none" }}
+          />
+          <HStack flex={1} alignItems="center" justifyContent="space-between">
+            <Text fontSize="xl" fontWeight="bold">
+              {!selectedChat.isGroupChat
+                ? getSender(user, selectedChat.users)
+                : selectedChat.chatName.toUpperCase()}
+            </Text>
+            {!selectedChat.isGroupChat ? (
+              <ProfileModal user={getSenderFull(user, selectedChat.users)}>
+                <Icon as={MaterialIcons} name="visibility" size={6} />
+              </ProfileModal>
+            ) : (
+              <UpdateGroupChatModal
+                fetchAgain={fetchAgain}
+                setFetchAgain={setFetchAgain}
+                fetchMessages={fetchMessages}
+              />
+            )}
+          </HStack>
         </HStack>
-      </HStack>
+      </Box>
 
       <Box flex={1} borderRadius="lg" p={2}>
         <Box
           flex={1}
           bg="white"
           borderRadius="lg"
+          borderWidth={2}
+          borderColor="#00BFFF"
           px={3}
           py={2}
           mb={2}
