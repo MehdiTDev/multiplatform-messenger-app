@@ -182,15 +182,24 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const socket = socketRef.current;
 
     socket.on("message received", (newMessageReceived) => {
+      // Only show notification if:
+      // 1. No chat is selected OR
+      // 2. The message is not for the currently selected chat
       if (
         !selectedChatCompare.current ||
         selectedChatCompare.current._id !== newMessageReceived.chat._id
       ) {
+        // Check if notification already exists to prevent duplicates
         if (!notification.some((n) => n._id === newMessageReceived._id)) {
           setNotification((prev) => [newMessageReceived, ...prev]);
           setFetchAgain((prev) => !prev);
         }
-      } else {
+      }
+      // Always update messages if it's for the current chat
+      if (
+        selectedChatCompare.current &&
+        selectedChatCompare.current._id === newMessageReceived.chat._id
+      ) {
         setMessages((prev) => [...prev, newMessageReceived]);
       }
     });

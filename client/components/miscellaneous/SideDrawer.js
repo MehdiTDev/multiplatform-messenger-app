@@ -66,8 +66,12 @@ export default function SideDrawer() {
     socket.emit("setup", user);
 
     socket.on("message received", (newMessageReceived) => {
+      // Only show notification if:
+      // 1. No chat is selected OR
+      // 2. The message is not for the currently selected chat
       if (!selectedChat || selectedChat._id !== newMessageReceived.chat._id) {
         setNotification((prev) => {
+          // Check if notification already exists to prevent duplicates
           if (prev.find((n) => n._id === newMessageReceived._id)) return prev;
           return [newMessageReceived, ...prev];
         });
@@ -77,7 +81,7 @@ export default function SideDrawer() {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [selectedChat]);
 
   const logoutHandler = () => {
     storage.removeItem("userInfo");
