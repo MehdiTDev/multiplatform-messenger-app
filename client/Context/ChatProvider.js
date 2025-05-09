@@ -29,8 +29,8 @@ const ChatProvider = ({ children }) => {
 
 
   useEffect(() => {
-    const fetchUser = () => {
-      const userInfo = storage.getItem("userInfo");
+    const fetchUser = async () => {
+      const userInfo = await storage.getItem("userInfo");
 
       if (typeof userInfo === "string") {
         try {

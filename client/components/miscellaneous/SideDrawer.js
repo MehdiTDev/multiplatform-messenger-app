@@ -28,6 +28,8 @@ import axios from "axios";
 import io from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getENDPOINT } from "../../config/ChatLogics";
+import { BackHandler } from 'react-native';
+
 
 let socket;
 
@@ -41,6 +43,11 @@ export default function SideDrawer() {
   } else if (Platform.OS === "android") {
     storage = AsyncStorage;
   }
+
+  if (!BackHandler.removeEventListener) {
+    BackHandler.removeEventListener = () => { };
+  }
+
 
   const ENDPOINT = getENDPOINT(Platform)
   const [search, setSearch] = useState("");
@@ -250,7 +257,7 @@ export default function SideDrawer() {
         />
       )}
 
-      <Slide in={isOpen} placement="left" duration={300}>
+      {/*  <Slide in={isOpen} placement="left" duration={300}>
         <Box
           w="300px"
           h="100%"
@@ -265,7 +272,6 @@ export default function SideDrawer() {
               Search users
             </Text>
 
-            {/* Updated HStack with input padding */}
             <HStack space={2} w="100%" px="3px" mb={3}>
               <Input
                 h={10}
@@ -295,7 +301,7 @@ export default function SideDrawer() {
             {loadingChat && <Spinner ml="auto" />}
           </VStack>
         </Box>
-      </Slide>
+      </Slide>*/}
     </>
   );
 }

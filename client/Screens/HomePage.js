@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import Login from "../components/Authentication/Login";
 import Signup from "../components/Authentication/Signup";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getENDPOINT } from "../config/ChatLogics";
+//import { getENDPOINT } from "../config/ChatLogics";
 
 
 export default function HomePage({ navigation }) {
@@ -28,7 +28,7 @@ export default function HomePage({ navigation }) {
     storage = AsyncStorage;
   }
 
-  console.log("the endPoint in Home page is the following", getENDPOINT(Platform));
+  //console.log("the endPoint in Home page is the following", getENDPOINT(Platform));
   // EndPoint is not needed here. This is just for testing. 
 
   useEffect(() => {
@@ -42,6 +42,7 @@ export default function HomePage({ navigation }) {
         if (typeof userInfoString === "string") {
           const parsedUser = JSON.parse(userInfoString);
           if (parsedUser) {
+            console.log("howePage; User:", parsedUser)
             navigation.navigate("ChatPage");
           }
         }

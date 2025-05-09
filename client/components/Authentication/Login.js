@@ -67,8 +67,16 @@ export default function Login({ navigation }) {
         config
       );
 
-      storage.setItem("userInfo", JSON.stringify(data));
+      if (Platform.OS === 'web') {
+        storage.setItem("userInfo", JSON.stringify(data));
+
+      } else {
+
+        await storage.setItem("userInfo", JSON.stringify(data));
+
+      }
       setUser(data);
+      console.log("the data", data);
 
       toast.show({
         title: "Success",

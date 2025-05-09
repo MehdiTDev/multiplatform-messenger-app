@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, useWindowDimensions } from "react-native";
+import { StyleSheet, useWindowDimensions, SafeAreaView } from "react-native";
 import { Box, VStack, HStack } from "native-base";
 import { ChatState } from "../Context/ChatProvider";
 import SideDrawer from "../components/miscellaneous/SideDrawer";
@@ -12,28 +12,34 @@ export default function ChatPage({ navigation }) {
   const isMobile = width < 768;
   const [fetchAgain, setFetchAgain] = useState(false);
 
+  console.log("this is the chatPage")
+  console.log(" ChatPage; user:", user)
   return (
 
-    <VStack style={styles.mainContainer}>
-      {/* SideDrawer at the top */}
-      {user && <SideDrawer />}
-      {/* Horizontal chat area */}
-      <HStack style={styles.chatContainer}>
-        {/* Show MyChats if not mobile OR if mobile and no chat is selected */}
-        {user && (!isMobile || (isMobile && !selectedChat)) && (
-          <Box style={isMobile ? styles.fullWidth : styles.myChats}>
-            <MyChats fetchAgain={fetchAgain} />
-          </Box>
-        )}
+    <SafeAreaView style={styles.SafeAreaContainer}>
 
-        {/* Show Chatbox if not mobile OR if mobile and chat is selected */}
-        {user && (!isMobile || (isMobile && selectedChat)) && (
-          <Box style={isMobile ? styles.fullWidth : styles.chatBox}>
-            <Chatbox />
-          </Box>
-        )}
-      </HStack>
-    </VStack>
+      <VStack style={styles.mainContainer}>
+        {/* SideDrawer at the top */}
+        {user && <SideDrawer />}
+        {/* Horizontal chat area */}
+        <HStack style={styles.chatContainer}>
+          {/* Show MyChats if not mobile OR if mobile and no chat is selected */}
+          {user && (!isMobile || (isMobile && !selectedChat)) && (
+            <Box style={isMobile ? styles.fullWidth : styles.myChats}>
+              <MyChats fetchAgain={fetchAgain} />
+            </Box>
+          )}
+
+          {/* Show Chatbox if not mobile OR if mobile and chat is selected */}
+          {user && (!isMobile || (isMobile && selectedChat)) && (
+            <Box style={isMobile ? styles.fullWidth : styles.chatBox}>
+              <Chatbox />
+            </Box>
+          )}
+        </HStack>
+      </VStack>
+    </SafeAreaView>
+
   );
 }
 
@@ -57,5 +63,11 @@ const styles = StyleSheet.create({
   },
   fullWidth: {
     width: "100%",
+  },
+  SafeAreaContainer: {
+
+    flex: 1,
+    padding: 16,
+
   },
 });

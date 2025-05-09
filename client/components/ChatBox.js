@@ -3,12 +3,18 @@ import { useWindowDimensions } from "react-native";
 import { Box } from "native-base";
 import SingleChat from "./SingleChat";
 import { ChatState } from "../Context/ChatProvider";
+import { BackHandler } from 'react-native';
+
 
 const Chatbox = ({ fetchAgain, setFetchAgain }) => {
   const { selectedChat } = ChatState();
   const { width } = useWindowDimensions();
 
   const isMobile = width < 768;
+
+  if (!BackHandler.removeEventListener) {
+    BackHandler.removeEventListener = () => { };
+  }
 
   // Conditionally render only when chat is selected on mobile
   if (isMobile && !selectedChat) {
