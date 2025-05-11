@@ -20,7 +20,7 @@ export default function ChatPage({ navigation }) {
 
       <VStack style={styles.mainContainer}>
         {/* SideDrawer at the top */}
-        {user && <SideDrawer />}
+        {user && <SideDrawer navigation={navigation} />}
         {/* Horizontal chat area */}
         <HStack style={styles.chatContainer}>
           {/* Show MyChats if not mobile OR if mobile and no chat is selected */}

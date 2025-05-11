@@ -33,7 +33,7 @@ import { BackHandler } from 'react-native';
 
 let socket;
 
-export default function SideDrawer() {
+export default function SideDrawer({ navigation }) {
   var storage = AsyncStorage;
 
   if (Platform.OS === "web") {
@@ -45,7 +45,7 @@ export default function SideDrawer() {
   }
 
   if (!BackHandler.removeEventListener) {
-    BackHandler.removeEventListener = () => { };
+    BackHandler.removeEventListener = () => { console.log("this is a BackHandler") }
   }
 
 
@@ -88,8 +88,8 @@ export default function SideDrawer() {
     };
   }, []);
 
-  const logoutHandler = () => {
-    storage.removeItem("userInfo");
+  const logoutHandler = async () => {
+    await storage.removeItem("userInfo");
     navigation.navigate("HomePage");
   };
 
@@ -257,7 +257,7 @@ export default function SideDrawer() {
         />
       )}
 
-      {/*  <Slide in={isOpen} placement="left" duration={300}>
+      <Slide in={isOpen} placement="left" duration={300}>
         <Box
           w="300px"
           h="100%"
@@ -301,7 +301,7 @@ export default function SideDrawer() {
             {loadingChat && <Spinner ml="auto" />}
           </VStack>
         </Box>
-      </Slide>*/}
+      </Slide>
     </>
   );
 }
